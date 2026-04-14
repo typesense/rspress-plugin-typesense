@@ -6,6 +6,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime/index.d.ts",
+      "default": "./dist/runtime/index.js"
     }
   },
   "types": "./dist/index.d.ts",
@@ -19,6 +23,16 @@
   "devDependencies": {
     "@rslib/core": "^0.20.1",
     "@types/node": "^24.12.0",
+    "rsbuild-plugin-publint": "^0.3.4",
     "typescript": "^6.0.2"
+  },
+  "peerDependencies": {
+    "@rspress/core": "^2.0.8"
+  },
+  "dependencies": {
+    "stream-chain": "^3.6.1",
+    "stream-json": "^2.1.0",
+    "typesense-docsearch-css": "^0.4.1",
+    "typesense-docsearch-react": "^3.4.1"
   }
 }

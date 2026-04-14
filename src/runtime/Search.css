@@ -1,0 +1,46 @@
+[class*='DocSearch'] {
+  --docsearch-primary-color: var(--rp-c-brand);
+  --docsearch-text-color: var(--rp-c-text-1);
+  --docsearch-secondary-text-color: var(--rp-c-text-2);
+  --docsearch-muted-color: var(--rp-c-text-2);
+  --docsearch-subtle-color: var(--rp-c-divider-light);
+
+  --docsearch-container-background: rgba(60, 60, 60, 0.4);
+  --docsearch-modal-background: var(--rp-c-bg);
+
+  --docsearch-search-button-background: color-mix(
+    in srgb,
+    var(--rp-c-bg) 30%,
+    transparent
+  );
+
+  --docsearch-search-button-text-color: var(--rp-c-text-2);
+  --docsearch-searchbox-background: var(--rp-c-bg-soft);
+  --docsearch-searchbox-focus-background: var(--rp-c-bg);
+
+  --docsearch-hit-highlight-color: var(--rp-c-brand-tint);
+  --docsearch-hit-color: var(--rp-c-text-1);
+  --docsearch-hit-background: var(--rp-c-bg-soft);
+  --docsearch-hit-shadow: var(--rp-shadow-2);
+
+  --docsearch-footer-background: var(--rp-c-bg);
+
+  --docsearch-key-background: var(--rp-c-bg-mute);
+  --docsearch-key-color: var(--rp-c-text-2);
+
+  --docsearch-highlight-color: var(--rp-c-brand);
+  --docsearch-icon-color: var(--rp-c-text-1);
+  --docsearch-background-color: var(--rp-c-bg-mute);
+  --docsearch-focus-color: var(--rp-c-brand);
+
+  --docsearch-dropdown-menu-background: var(--rp-c-bg-soft);
+  --docsearch-dropdown-menu-item-hover-background: var(--rp-c-bg);
+}
+
+.DocSearch {
+  border-radius: var(--rp-radius-small);
+}
+
+.DocSearch-Button-Container > .DocSearch-Button-Placeholder {
+  font-size: 0.825rem;
+}

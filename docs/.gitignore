@@ -6,12 +6,9 @@
 # Dist
 node_modules
 dist/
-storybook-static
 doc_build/
 
 # IDE
 .vscode/*
 !.vscode/extensions.json
 .idea
-
-/typesense-data
