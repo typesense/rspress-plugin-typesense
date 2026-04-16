@@ -34,7 +34,7 @@ export class RspressConverter {
     const currentHierarchy: Hierarchy = {
       lvl0:
         item.frontmatter?.title ||
-        this.getCategoryFromPath(url) ||
+        this.getCategoryFromPath(url, item.version, item.lang) ||
         'Documentation',
       lvl1: item.title || null,
       lvl2: null,
@@ -201,11 +201,34 @@ export class RspressConverter {
       .trim();
   }
 
-  private static getCategoryFromPath(routePath: string): string | null {
+  private static getCategoryFromPath(
+    routePath: string,
+    version?: string,
+    lang?: string,
+  ): string | null {
     const parts = routePath.split('/').filter(Boolean);
-    if (parts.length > 0)
-      return parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
-    return null;
+    if (parts.length === 0) return null;
+
+    let startIndex = 0;
+
+    // Safely skip any URL segments that perfectly match the version or language
+    while (
+      startIndex < parts.length &&
+      ((version && parts[startIndex] === version) ||
+        (lang && parts[startIndex] === lang))
+    ) {
+      startIndex++;
+    }
+
+    const cat = parts[startIndex];
+    if (!cat) return 'Documentation';
+
+    // Format the string: 'getting-started' -> 'Getting Started'
+    return cat
+      .split('-')
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 
   private static getHierarchyRadio(

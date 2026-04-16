@@ -38,7 +38,4 @@ export default defineConfig({
     default: 'v1',
     versions: ['v1', 'v2'],
   },
-  search: {
-    versioned: false,
-  },
 });

@@ -25,10 +25,11 @@ export function pluginTypesense(
       return config;
     },
 
-    async afterBuild(config) {
-      console.log('Search conf: ', config.search);
+    async afterBuild(config, isProd) {
+      if (!isProd) return;
+
       // @ts-ignore
-      const isVersioned = config.search?.versioned ?? false;
+      const isVersioned = config.search?.versioned ?? true;
       const defaultLang = config.lang || 'en';
 
       // Rspress outputs search indices to /static
