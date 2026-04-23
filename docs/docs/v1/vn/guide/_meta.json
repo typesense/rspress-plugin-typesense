@@ -8,5 +8,10 @@
     "type": "dir-section-header",
     "name": "use-mdx",
     "label": "Markdown & MDX"
+  },
+  {
+    "type": "file",
+    "name": "test",
+    "label": "Test"
   }
 ]

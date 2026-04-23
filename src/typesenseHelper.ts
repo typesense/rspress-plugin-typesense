@@ -4,22 +4,26 @@ import type { ConfigurationOptions } from 'typesense/lib/Typesense/Configuration
 import type { ImportResponse } from 'typesense/lib/Typesense/Documents';
 import type { DocSearchRecord, CustomSettings } from './types';
 
+export interface TypesenseHelperOptions {
+  config: ConfigurationOptions;
+  aliasName: string;
+  collectionNameTmp: string;
+  customSettings: CustomSettings | null;
+  locale: string;
+  isVersioned: boolean;
+}
+
 export class TypesenseHelper {
   private typesenseClient: Client;
   private aliasName: string;
   private collectionNameTmp: string;
   private collectionLocale: string;
   private customSettings: CustomSettings | null;
+  private isVersioned: boolean;
   private typesenseVersion: number = 0;
 
-  constructor(
-    config: ConfigurationOptions,
-    aliasName: string,
-    collectionNameTmp: string,
-    customSettings: CustomSettings | null,
-    locale: string,
-  ) {
-    const clientConfig = { ...config };
+  constructor(options: TypesenseHelperOptions) {
+    const clientConfig = { ...options.config };
     clientConfig.connectionTimeoutSeconds =
       clientConfig.connectionTimeoutSeconds || 1800;
     clientConfig.retryIntervalSeconds = clientConfig.retryIntervalSeconds || 1;
@@ -29,11 +33,12 @@ export class TypesenseHelper {
     clientConfig.logLevel = clientConfig.logLevel || 'error';
 
     this.typesenseClient = new Client(clientConfig);
-    this.aliasName = aliasName;
-    this.collectionNameTmp = collectionNameTmp;
+    this.aliasName = options.aliasName;
+    this.collectionNameTmp = options.collectionNameTmp;
     this.collectionLocale =
-      locale || process.env.TYPESENSE_COLLECTION_LOCALE || 'en';
-    this.customSettings = customSettings;
+      options.locale || process.env.TYPESENSE_COLLECTION_LOCALE || 'en';
+    this.customSettings = options.customSettings;
+    this.isVersioned = options.isVersioned;
   }
 
   public async init() {
@@ -48,13 +53,11 @@ export class TypesenseHelper {
   }
 
   public async createTmpCollection(): Promise<void> {
-    // Ensure version is set
     if (this.typesenseVersion === 0) await this.init();
 
     try {
       await this.typesenseClient.collections(this.collectionNameTmp).delete();
     } catch (error: any) {
-      // Ignore ObjectNotFound
       if (error?.httpStatus !== 404) throw error;
     }
 
@@ -68,14 +71,13 @@ export class TypesenseHelper {
           locale: this.collectionLocale,
           optional: true,
         },
-        { name: 'url', type: 'string', facet: true },
+        { name: 'url', type: 'string' },
         {
           name: 'url_without_anchor',
           type: 'string',
           facet: true,
           optional: true,
         },
-        { name: 'version', type: 'string[]', facet: true, optional: true },
         ...Array.from({ length: 7 }).map((_, i) => ({
           name: `hierarchy.lvl${i}`,
           type: 'string' as const,
@@ -87,22 +89,6 @@ export class TypesenseHelper {
           name: 'type',
           type: 'string',
           facet: true,
-          locale: this.collectionLocale,
-          optional: true,
-        },
-        {
-          name: '.*_tag',
-          type: 'string',
-          facet: true,
-          locale: this.collectionLocale,
-          optional: true,
-        },
-        { name: 'language', type: 'string', facet: true, optional: true },
-        {
-          name: 'tags',
-          type: 'string[]',
-          facet: true,
-          locale: this.collectionLocale,
           optional: true,
         },
         { name: 'item_priority', type: 'int64' },
@@ -111,6 +97,17 @@ export class TypesenseHelper {
       token_separators: ['_', '-'],
     };
 
+    // Dynamically append the version field if the project is versioned
+    if (this.isVersioned) {
+      schema.fields!.push({
+        name: 'version',
+        type: 'string[]',
+        facet: true,
+        optional: true,
+      });
+    }
+
+    // Custom overrides mapping
     if (this.customSettings) {
       if (this.customSettings.token_separators) {
         schema.token_separators = this.customSettings.token_separators;
@@ -135,7 +132,7 @@ export class TypesenseHelper {
     fromSitemap: boolean,
   ): Promise<void> {
     const transformedRecords = records.map((r) =>
-      TypesenseHelper.transformRecord(r),
+      TypesenseHelper.transformRecord(r, this.isVersioned),
     );
     const recordCount = transformedRecords.length;
 
@@ -156,7 +153,7 @@ export class TypesenseHelper {
 
     const color = fromSitemap ? '96' : '94';
     console.log(
-      `\x1b[${color}m> Typesense DocSearch Chunk: \x1b[0m${fileName}\x1b[93m ${recordCount} records processed\x1b[0m`,
+      `\x1b[${color}m> Typesense DocSearch Chunk: \x1b[0m${fileName}\x1b[93m ${recordCount} records\x1b[0m`,
     );
   }
 
@@ -177,15 +174,20 @@ export class TypesenseHelper {
     }
   }
 
-  public static transformRecord(record: DocSearchRecord): any {
+  public static transformRecord(
+    record: DocSearchRecord,
+    isVersioned: boolean,
+  ): any {
     const transformedRecord: any = {};
 
-    // Filter out null/undefined values
+    // Explicitly exclude properties that are no longer in our collection schema
+    const excludeKeys = ['weight', 'language', 'tags', '.*_tag'];
+
     for (const key in record) {
       if (
         record[key] !== null &&
         record[key] !== undefined &&
-        key !== 'weight'
+        !excludeKeys.includes(key)
       ) {
         transformedRecord[key] = record[key];
       }
@@ -214,9 +216,12 @@ export class TypesenseHelper {
       }
     }
 
-    // Handle Versions
-    if (record.version && typeof record.version === 'string') {
+    // Handle Versions dynamically
+    if (isVersioned && record.version && typeof record.version === 'string') {
       transformedRecord['version'] = record.version.split(',');
+    } else if (!isVersioned) {
+      // Ensure we don't accidentally push version into the DB if not in schema
+      delete transformedRecord['version'];
     }
 
     return transformedRecord;

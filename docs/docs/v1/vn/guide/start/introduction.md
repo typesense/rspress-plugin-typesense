@@ -10,6 +10,10 @@ Rspress is a static site generator based on [Rsbuild](https://rsbuild.rs/), rend
 - **Basic Capabilities**. Including full-text search, internationalization, multi-version support, component library documentation, etc.
 - **Extensibility**. Provides a built-in plugin system, supports extending Rspress through plugin API.
 
+### Test h3
+
+This is a test for h3.
+
 ## Try Rspress
 
 Go to [Getting Started](/guide/start/getting-started) to learn how to use Rspress to build a documentation site.

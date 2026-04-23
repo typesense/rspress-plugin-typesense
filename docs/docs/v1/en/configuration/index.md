@@ -1,0 +1,56 @@
+# Configuration
+
+The Starlight Docsearch Typesense plugin is configured in your project's `astro.config.mjs` file:
+
+```js
+import starlight from '@astrojs/starlight';
+import { defineConfig } from 'astro/config';
+import starlightDocSearchTypesense from 'starlight-docsearch-typesense';
+export default defineConfig({
+  integrations: [
+    starlight({
+      plugins: [
+        starlightDocSearchTypesense({
+          // Configuration options go here.
+        }),
+      ],
+      title: 'My Docs',
+    }),
+  ],
+});
+```
+
+## Configuration options
+
+You can pass the following options to `starlightDocSearchTypesense()`:
+
+| Property                                                                      | Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description                                                                                                                                                                                                                |
+| ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **typesenseCollectionName** <Badge text='Required' variant='caution' />       | `string`                                                                                                                     | The name of the **Typesense collection** to search. If using [`typesense-docsearch-scraper`](https://typesense.org/docs/latest/guide/docsearch.html), it **must match** the `index_name` field in the scraper config file. |
+| **typesenseServerConfig** <Badge text='Required' variant='caution' />         | `object`                                                                                                                     | Configuration object for connecting to the **Typesense server**. See [Typesense Server Config](#typesenseServerConfig) below.                                                                                              |
+| **typesenseSearchParameters**                                                 | `SearchOptions`                                                                                                              | Additional <a href="https://typesense.org/docs/latest/api/search.html#search-parameters" target="_blank">Typesense search parameters</a> to fine-tune search behavior (e.g., filters, facets, ranking).                    |
+| **disableUserPersonalization** <Badge text="default: false" variant="note" /> | `boolean`                                                                                                                    | Disables storing recent searches and favorites in local storage.                                                                                                                                                           |
+| **initialQuery**                                                              | `string`                                                                                                                     | Initial query string to prefill the search box when the component first renders.                                                                                                                                           |
+
+### `typesenseServerConfig`
+
+| Property                                               | Type                                                            | Description                                                                   |
+| ------------------------------------------------------ | --------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| **apiKey** <Badge text='Required' variant='caution' /> | `string`                                                        | The API key used to authenticate with the Typesense server.                   |
+| **nodes** <Badge text='Required' variant='caution' />  | `Array<Node>`                                                   | List of Typesense nodes.                                                      |
+| **randomizeNodes**                                     | `boolean`                                                       | Randomizes the order of nodes for load balancing.                             |
+| **nearestNode**                                        | `Node`                                                          | The node prioritized for making requests, usually the load-balanced endpoint. |
+| **connectionTimeoutSeconds**                           | `number`                                                        | Connection timeout for API calls, in seconds.                                 |
+| **healthcheckIntervalSeconds**                         | `number`                                                        | Frequency to perform health checks for failed nodes.                          |
+| **numRetries**                                         | `number`                                                        | Number of retry attempts for failed requests.                                 |
+| **retryIntervalSeconds**                               | `number`                                                        | Delay between retry attempts, in seconds.                                     |
+| **sendApiKeyAsQueryParam**                             | `boolean`                                                       | Sends the API key as a query parameter instead of a header.                   |
+| **useServerSideSearchCache**                           | `boolean`                                                       | Enables the server-side search cache feature.                                 |
+| **cacheSearchResultsForSeconds**                       | `number`                                                        | Duration to cache search results.                                             |
+| **additionalHeaders**                                  | `Record<string, string>`                                        | Custom HTTP headers to send with every request.                               |
+| **logLevel**                                           | `'error' \| 'warn' \| 'info' \| 'debug' \| 'trace' \| 'silent'` | Sets the verbosity level for client logs.                                     |
+
+## Additional DocSearch options
+
+You can extend the plugin with custom DocSearch client behavior in a separate configuration file, similar to the official <a href="https://starlight.astro.build/guides/site-search/#algolia-docsearch" target="_blank">`@astrojs/starlight-docsearch`</a>
+plugin.

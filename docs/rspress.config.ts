@@ -3,6 +3,22 @@ import { defineConfig } from '@rspress/core';
 import { pluginTypesense } from '../src/index';
 
 export default defineConfig({
+  lang: 'en',
+  locales: [
+    {
+      lang: 'en',
+      // The label in nav bar to switch language
+      label: 'English',
+      title: 'Rspress',
+      description: 'Static Site Generator',
+    },
+    {
+      lang: 'vn',
+      label: 'Tiếng Việt',
+      title: 'Rspress',
+      description: 'Static Site Generator',
+    },
+  ],
   plugins: [
     pluginTypesense({
       collectionName: 'rspress_docs',

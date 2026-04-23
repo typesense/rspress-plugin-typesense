@@ -26,7 +26,7 @@ export interface DocSearchRecord {
   hierarchy_radio: Hierarchy;
   type: string;
   weight: RecordWeight;
-  version?: string | string[];
+  version?: string;
   language?: string;
   [key: string]: any;
 }

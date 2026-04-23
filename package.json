@@ -30,8 +30,7 @@
     "@rspress/core": "^2.0.8"
   },
   "dependencies": {
-    "stream-chain": "^3.6.1",
-    "stream-json": "^2.1.0",
+    "cheerio": "^1.2.0",
     "typesense-docsearch-css": "^0.4.1",
     "typesense-docsearch-react": "^3.4.1"
   }
