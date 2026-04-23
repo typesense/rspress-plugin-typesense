@@ -53,7 +53,7 @@ function Search({
   }
 
   if (versionedSearch && version) {
-    filters.push(`version:=${version}`);
+    filters.push(`version:=\`${version}\``);
   }
 
   if (filters.length > 0) {
@@ -69,8 +69,7 @@ function Search({
         translations={translations}
         transformItems={(items) => {
           const transformedItems = items.map((item) => {
-            // Clone the item to mutate its highlight/snippet results
-            const transformed = { ...item };
+            const transformed = structuredClone(item);
 
             // Escape Snippets (Paragraphs)
             if (transformed._snippetResult?.content?.value) {

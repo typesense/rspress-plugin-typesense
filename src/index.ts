@@ -2,14 +2,14 @@ import type { RouteMeta, RspressPlugin } from '@rspress/core';
 import path from 'path';
 import fs from 'fs';
 import type { ConfigurationOptions } from 'typesense/lib/Typesense/Configuration';
-import type { CustomSettings } from './types';
+import type { CustomSettings, CustomSettingsConfig } from './types';
 import { TypesenseHelper } from './typesenseHelper';
 import { IndexFromHtml } from './indexFromHtml';
 
 export interface TypesensePluginOptions {
   typesenseOptions: ConfigurationOptions;
   collectionName: string;
-  customSettings?: CustomSettings;
+  customSettings?: CustomSettingsConfig;
 }
 
 export function pluginTypesense(
@@ -76,11 +76,16 @@ export function pluginTypesense(
           `\n[TypesensePlugin] Processing group: ${aliasName} (${routes.length} routes)`,
         );
 
+        const localizedCustomSettings = resolveCustomSettings(
+          options.customSettings,
+          locale,
+        );
+
         const helper = new TypesenseHelper({
           config: options.typesenseOptions,
           aliasName,
           collectionNameTmp,
-          customSettings: options.customSettings || null,
+          customSettings: localizedCustomSettings,
           locale,
           isVersioned,
         });
@@ -166,4 +171,27 @@ export function pluginTypesense(
       }
     },
   };
+}
+
+// Helper to determine if the user provided global settings or per-lang settings
+function resolveCustomSettings(
+  settings: CustomSettingsConfig | undefined,
+  locale: string,
+): CustomSettings | null {
+  if (!settings) return null;
+
+  // Detect if it's a global config by looking for known root keys
+  const isGlobalConfig =
+    'token_separators' in settings ||
+    'symbols_to_index' in settings ||
+    'field_definitions' in settings ||
+    'enable_nested_fields' in settings;
+
+  if (isGlobalConfig) {
+    return settings as CustomSettings;
+  }
+
+  // Otherwise, treat it as a per-language map
+  const perLangSettings = settings as Record<string, CustomSettings>;
+  return perLangSettings[locale] || null;
 }

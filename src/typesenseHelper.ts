@@ -71,7 +71,7 @@ export class TypesenseHelper {
           locale: this.collectionLocale,
           optional: true,
         },
-        { name: 'url', type: 'string' },
+        { name: 'url', type: 'string', facet: true },
         {
           name: 'url_without_anchor',
           type: 'string',

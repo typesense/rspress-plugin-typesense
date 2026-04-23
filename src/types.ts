@@ -26,7 +26,7 @@ export interface DocSearchRecord {
   hierarchy_radio: Hierarchy;
   type: string;
   weight: RecordWeight;
-  version?: string;
+  version?: string | string[];
   language?: string;
   [key: string]: any;
 }
@@ -37,3 +37,8 @@ export interface CustomSettings {
   field_definitions?: any[];
   enable_nested_fields?: boolean;
 }
+
+// Allows a single global config OR a map of configs keyed by language (e.g. { en: {...}, zh: {...} })
+export type CustomSettingsConfig =
+  | CustomSettings
+  | Record<string, CustomSettings>;
