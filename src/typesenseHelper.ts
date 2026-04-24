@@ -130,7 +130,8 @@ export class TypesenseHelper {
     records: DocSearchRecord[],
     fileName: string,
     fromSitemap: boolean,
-  ): Promise<void> {
+    padLength: number = 40, // parameter for dynamic column alignment
+  ): Promise<number> {
     const transformedRecords = records.map((r) =>
       TypesenseHelper.transformRecord(r, this.isVersioned),
     );
@@ -151,10 +152,20 @@ export class TypesenseHelper {
       throw new Error('Failed to import some records');
     }
 
-    const color = fromSitemap ? '96' : '94';
+    // Choose icon color (Cyan for sitemap, Green for HTML)
+    const iconColor = fromSitemap ? '\x1b[36m' : '\x1b[32m';
+
+    // Calculate how many dots we need to align the second column
+    const fillerLength = Math.max(2, padLength - fileName.length);
+    const filler = '\x1b[90m' + '.'.repeat(fillerLength) + '\x1b[0m'; // Gray dots
+
+    // Pad the record count to always take up 4 spaces (e.g., "   2", "  25", " 150")
+    const paddedCount = recordCount.toString().padStart(4, ' ');
+
     console.log(
-      `\x1b[${color}m> Typesense DocSearch Chunk: \x1b[0m${fileName}\x1b[93m ${recordCount} records\x1b[0m`,
+      `  ${iconColor}✔\x1b[0m \x1b[37m${fileName}\x1b[0m ${filler} \x1b[33m${paddedCount}\x1b[0m \x1b[90mrecords\x1b[0m`,
     );
+    return recordCount;
   }
 
   public async commitTmpCollection(): Promise<void> {

@@ -40,7 +40,7 @@ export function pluginTypesense(
 
       if (generatedRoutes.length === 0) {
         console.warn(
-          '[TypesensePlugin] No routes generated. Skipping indexing.',
+          `\n\x1b[33m⚠ [TypesensePlugin] No routes generated.\x1b[0m \x1b[90mSkipping indexing.\x1b[0m\n`,
         );
         return;
       }
@@ -72,8 +72,16 @@ export function pluginTypesense(
         const aliasName = `${options.collectionName}_${locale}`;
         const collectionNameTmp = `${aliasName}_${Date.now()}`;
 
+        // Calculate column padding for pretty console output
+        const maxRouteLength = routes.reduce(
+          (max, r) => Math.max(max, r.routePath.length),
+          0,
+        );
+        const padLength = Math.max(maxRouteLength + 4, 30); // Add at least 4 dots of spacing
+
+        // Prettified Group Header
         console.log(
-          `\n[TypesensePlugin] Processing group: ${aliasName} (${routes.length} routes)`,
+          `\n\x1b[1m\x1b[36m[TypesensePlugin]\x1b[0m \x1b[1mProcessing group:\x1b[0m \x1b[35m${aliasName}\x1b[0m \x1b[90m(${routes.length} routes)\x1b[0m`,
         );
 
         const localizedCustomSettings = resolveCustomSettings(
@@ -93,6 +101,7 @@ export function pluginTypesense(
         await helper.init();
         await helper.createTmpCollection();
 
+        let totalRecords = 0;
         // Process each route's HTML File
         for (const route of routes) {
           const version = route.version || defaultVersion;
@@ -127,8 +136,13 @@ export function pluginTypesense(
           }
 
           if (!fileFound) {
+            const fillerLength = Math.max(
+              2,
+              padLength - route.routePath.length,
+            );
+            const filler = '\x1b[90m' + '.'.repeat(fillerLength) + '\x1b[0m';
             console.warn(
-              `[TypesensePlugin] HTML file not found: ${htmlPath}. Skipping route: ${route.routePath}`,
+              `  \x1b[33m⚠\x1b[0m \x1b[37m${route.routePath}\x1b[0m ${filler} \x1b[33mskipped\x1b[0m \x1b[90m(HTML not found)\x1b[0m`,
             );
             continue;
           }
@@ -147,12 +161,24 @@ export function pluginTypesense(
             }
 
             if (records.length > 0) {
-              await helper.addRecords(records, route.routePath, false);
+              totalRecords += await helper.addRecords(
+                records,
+                route.routePath,
+                false,
+                padLength,
+              );
             }
           } catch (error) {
+            const fillerLength = Math.max(
+              2,
+              padLength - route.routePath.length,
+            );
+            const filler = '\x1b[90m' + '.'.repeat(fillerLength) + '\x1b[0m';
             console.error(
-              `[TypesensePlugin] Error processing ${route.routePath}:`,
-              error,
+              `  \x1b[31m✖\x1b[0m \x1b[37m${route.routePath}\x1b[0m ${filler} \x1b[31m failed\x1b[0m \x1b[90m(Processing error)\x1b[0m`,
+            );
+            console.error(
+              `    \x1b[31m↳ ${error instanceof Error ? error.message : error}\x1b[0m`,
             );
           }
         }
@@ -160,7 +186,9 @@ export function pluginTypesense(
         // Commit Collection to Typesense
         try {
           await helper.commitTmpCollection();
-          console.log(`[TypesensePlugin] Indexing complete for ${aliasName}!`);
+          console.log(
+            `\x1b[32m✔ Indexing complete for\x1b[0m \x1b[35m${aliasName}\x1b[0m \x1b[90m—\x1b[0m \x1b[33m${totalRecords}\x1b[0m \x1b[90mtotal records!\x1b[0m`,
+          );
         } catch (error) {
           console.error(
             `[TypesensePlugin] Failed to commit collection ${aliasName}:`,
