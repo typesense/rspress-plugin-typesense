@@ -1,113 +1,178 @@
-import type { DocSearchProps } from 'typesense-docsearch-react';
-import { DocSearch } from 'typesense-docsearch-react';
-import { useLang, useNavigate, useVersion } from '@rspress/core/runtime';
-// @ts-expect-error @theme is not typed
-import { Link } from '@theme';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  Suspense,
+  useRef,
+  lazy,
+} from 'react';
+import type { SearchProps } from './RealSearch';
+
 import 'typesense-docsearch-css';
 import './Search.css';
-import type { Locales } from './locales';
+import { useLang } from '@rspress/core/runtime';
 
-const Hit: DocSearchProps['hitComponent'] = ({ hit, children }) => {
-  return <Link href={hit.url}>{children}</Link>;
-};
+const RealSearch = lazy(() => import('./RealSearch'));
 
-// A regex that escapes < and > UNLESS they are part of <mark> or </mark>
-const safeEscapeHighlights = (str: string) => {
-  if (!str) return str;
-  return str
-    .replace(/<(?!mark>|\/mark>)/gi, '&lt;')
-    .replace(/(?<!<mark|<\/mark)>/gi, '&gt;');
-};
+export function Search(props: SearchProps) {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const isLoadedRef = useRef(false);
+  const triggerRef = useRef<'hover' | 'keyboard' | 'idle' | null>(null);
 
-type SearchProps = {
-  docSearchProps: Omit<DocSearchProps, 'translations'>;
-  locales?: Locales;
-  versionedSearch?: boolean;
-};
-
-function Search({
-  locales = {},
-  versionedSearch = true,
-  docSearchProps: {
-    typesenseCollectionName,
-    transformItems,
-    typesenseSearchParameters,
-    ...docSearchProps
-  },
-}: SearchProps) {
-  const navigate = useNavigate();
-
-  const version = useVersion();
   const lang = useLang() || 'en';
+  const placeholder = props.locales?.[lang]?.placeholder || 'Search';
 
-  const { translations, placeholder } = locales?.[lang] ?? {};
+  const loadSearch = useCallback((trigger: 'hover' | 'keyboard' | 'idle') => {
+    if (!triggerRef.current) triggerRef.current = trigger;
+    if (!isLoadedRef.current) {
+      isLoadedRef.current = true;
+      setIsLoaded(true);
+    }
+  }, []);
 
-  // Resolve collection by locale
-  const resolvedCollectionName = `${typesenseCollectionName}_${lang}`;
+  useEffect(() => {
+    //  Load when browser is idle
+    let idleHandle: number | ReturnType<typeof setTimeout>;
+    if ('requestIdleCallback' in window) {
+      idleHandle = (window as any).requestIdleCallback(() =>
+        loadSearch('idle'),
+      );
+    } else {
+      idleHandle = setTimeout(() => loadSearch('idle'), 2000); // Safari fallback
+    }
 
-  const searchParams = { ...(typesenseSearchParameters || {}) };
-  const filters: string[] = [];
+    // Load globally on shortcut commands
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Don't intercept if user is typing in form inputs
+      const target = event.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      )
+        return;
 
-  if (searchParams.filter_by) {
-    filters.push(`(${searchParams.filter_by})`);
-  }
+      const isCmdK =
+        (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k';
+      const isSlash = event.key === '/';
 
-  if (versionedSearch && version) {
-    filters.push(`version:=\`${version}\``);
-  }
+      if (isCmdK || isSlash) {
+        if (!isLoadedRef.current) {
+          event.preventDefault(); // Stop native browser find or typing
+          loadSearch('keyboard');
+        }
+      }
+    };
 
-  if (filters.length > 0) {
-    searchParams.filter_by = filters.join(' && ');
-  }
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      if ('requestIdleCallback' in window) {
+        (window as any).cancelIdleCallback(idleHandle);
+      } else {
+        clearTimeout(idleHandle as number);
+      }
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [loadSearch]);
+
+  // Handle opening the real DocSearch modal automatically if invoked by keyboard
+  useEffect(() => {
+    if (isLoaded && triggerRef.current === 'keyboard') {
+      const interval = setInterval(() => {
+        const button = document.querySelector(
+          '.DocSearch-Button:not(.DocSearch-Fake-Button)',
+        );
+
+        if (button) {
+          (button as HTMLElement).click();
+          clearInterval(interval);
+          triggerRef.current = null;
+        }
+      }, 50); // Polling briefly checks when the Suspense block un-suspends
+
+      const timeout = setTimeout(() => clearInterval(interval), 5000);
+      return () => {
+        clearInterval(interval);
+        clearTimeout(timeout);
+      };
+    }
+  }, [isLoaded]);
 
   return (
     <>
-      <DocSearch
-        typesenseCollectionName={resolvedCollectionName}
-        typesenseSearchParameters={searchParams}
-        placeholder={placeholder}
-        translations={translations}
-        transformItems={(items) => {
-          const transformedItems = items.map((item) => {
-            const transformed = structuredClone(item);
-
-            // Escape Snippets (Paragraphs)
-            if (transformed._snippetResult?.content?.value) {
-              transformed._snippetResult.content.value = safeEscapeHighlights(
-                transformed._snippetResult.content.value,
-              );
-            }
-
-            // Escape Highlights (Headers/Titles)
-            if (transformed._highlightResult?.hierarchy) {
-              Object.values(transformed._highlightResult.hierarchy).forEach(
-                (level: any) => {
-                  if (level?.value) {
-                    level.value = safeEscapeHighlights(level.value);
-                  }
-                },
-              );
-            }
-
-            return transformed;
-          });
-
-          if (transformItems) {
-            return transformItems(transformedItems);
+      {isLoaded ? (
+        <Suspense
+          fallback={
+            <FakeSearchButton
+              placeholder={placeholder}
+              onMouseEnter={() => loadSearch('hover')}
+            />
           }
-          return transformedItems;
-        }}
-        navigator={{
-          navigate({ itemUrl }: { itemUrl: string }) {
-            navigate(itemUrl);
-          },
-        }}
-        hitComponent={Hit}
-        {...docSearchProps}
-      />
+        >
+          <RealSearch {...props} />
+        </Suspense>
+      ) : (
+        <FakeSearchButton
+          placeholder={placeholder}
+          onClick={() => loadSearch('hover')}
+          onMouseEnter={() => loadSearch('hover')}
+        />
+      )}
     </>
   );
 }
 
+function FakeSearchButton({
+  onClick,
+  onMouseEnter,
+  placeholder = 'Search',
+}: {
+  onClick?: () => void;
+  onMouseEnter?: () => void;
+  placeholder: string;
+}) {
+  const [modifierKey, setModifierKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    const isMac = /(Mac|iPhone|iPod|iPad)/i.test(
+      typeof navigator !== 'undefined' ? navigator.platform : '',
+    );
+    setModifierKey(isMac ? '⌘' : 'Ctrl');
+  }, []);
+
+  return (
+    <button
+      type='button'
+      className='DocSearch DocSearch-Button DocSearch-Fake-Button'
+      aria-label='Search'
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+    >
+      <span className='DocSearch-Button-Container'>
+        <svg
+          width='20'
+          height='20'
+          className='DocSearch-Search-Icon'
+          viewBox='0 0 20 20'
+        >
+          <path
+            d='M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z'
+            stroke='currentColor'
+            fill='none'
+            fill-rule='evenodd'
+            stroke-linecap='round'
+            stroke-linejoin='round'
+          ></path>
+        </svg>
+        <span className='DocSearch-Button-Placeholder'>{placeholder}</span>
+      </span>
+      <span className='DocSearch-Button-Keys'>
+        <kbd className='DocSearch-Button-Key'>{modifierKey}</kbd>
+        <kbd className='DocSearch-Button-Key'>K</kbd>
+      </span>
+    </button>
+  );
+}
+
 export type { SearchProps };
-export { Search };
