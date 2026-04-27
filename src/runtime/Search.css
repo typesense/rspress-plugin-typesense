@@ -90,3 +90,7 @@ html.dark {
   box-shadow: none;
   color: var(--docsearch-search-button-text-color);
 }
+
+.DocSearch-Screen-Icon svg {
+  margin: auto;
+}
