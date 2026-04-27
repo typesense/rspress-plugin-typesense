@@ -11,7 +11,7 @@
   },
   {
     "type": "file",
-    "name": "llms",
-    "label": "Llms"
+    "name": "test",
+    "label": "Test"
   }
 ]

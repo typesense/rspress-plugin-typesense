@@ -52,6 +52,22 @@ export function pluginTypesense(
       > = {};
 
       for (const route of generatedRoutes) {
+        // Automatically detect landing pages based on possible pageName permutations
+        // This handles cases where Rspress omits default version or default lang prefixes.
+        const possibleHomePages = [
+          'index', // Root fallback (e.g. single lang, default version)
+          route.lang ? `${route.lang}_index` : '', // Lang explicitly in path
+          route.version ? `${route.version}_index` : '', // Version explicitly in path
+          route.version && route.lang
+            ? `${route.version}_${route.lang}_index`
+            : '', // Both explicit
+        ];
+
+        if (possibleHomePages.includes(route.pageName)) {
+          // Skipping indexing for the landing page
+          continue;
+        }
+
         const locale = route.lang || defaultLang;
 
         const groupKey = locale;
@@ -60,6 +76,13 @@ export function pluginTypesense(
           routeGroups[groupKey] = { locale, routes: [] };
         }
         routeGroups[groupKey].routes.push(route);
+      }
+
+      if (Object.keys(routeGroups).length === 0) {
+        console.warn(
+          `\n\x1b[33m⚠ [TypesensePlugin] No routes found for indexing.\x1b[0m \x1b[90mSkipping indexing process.\x1b[0m\n`,
+        );
+        return;
       }
 
       const extractor = new IndexFromHtml();
