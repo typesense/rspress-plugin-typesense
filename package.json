@@ -1,5 +1,6 @@
 {
   "name": "rspress-plugin-typesense",
+  "description": "A plugin to add Typesense-powered search to your Rspress site",
   "version": "0.0.0",
   "type": "module",
   "exports": {
