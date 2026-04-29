@@ -34,5 +34,22 @@
     "cheerio": "^1.2.0",
     "typesense-docsearch-css": "^0.4.1",
     "typesense-docsearch-react": "^3.4.1"
+  },
+  "keywords": [
+    "typesense",
+    "documentation-search",
+    "search",
+    "rspress-plugin",
+    "rspress",
+    "plugin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/typesense/rspress-plugin-typesense.git"
+  },
+  "bugs": "https://github.com/typesense/rspress-plugin-typesense/issues",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -2,14 +2,24 @@ import type { RouteMeta, RspressPlugin } from '@rspress/core';
 import path from 'path';
 import fs from 'fs';
 import type { ConfigurationOptions } from 'typesense/lib/Typesense/Configuration';
-import type { CustomSettings, CustomSettingsConfig } from './types';
-import { TypesenseHelper } from './typesenseHelper';
+import type {
+  CustomCollectionSettings,
+  CustomCollectionSettingsConfig,
+} from './types';
+import { TypesenseHelper, getDefaultCollectionFields } from './typesenseHelper';
 import { IndexFromHtml } from './indexFromHtml';
+
+export type {
+  CustomCollectionSettings,
+  CustomCollectionSettingsConfig,
+} from './types';
+
+export { getDefaultCollectionFields };
 
 export interface TypesensePluginOptions {
   typesenseOptions: ConfigurationOptions;
   collectionName: string;
-  customSettings?: CustomSettingsConfig;
+  customCollectionSettings?: CustomCollectionSettingsConfig;
 }
 
 export function pluginTypesense(
@@ -108,7 +118,7 @@ export function pluginTypesense(
         );
 
         const localizedCustomSettings = resolveCustomSettings(
-          options.customSettings,
+          options.customCollectionSettings,
           locale,
         );
 
@@ -226,9 +236,9 @@ export function pluginTypesense(
 
 // Helper to determine if the user provided global settings or per-lang settings
 function resolveCustomSettings(
-  settings: CustomSettingsConfig | undefined,
+  settings: CustomCollectionSettingsConfig | undefined,
   locale: string,
-): CustomSettings | null {
+): CustomCollectionSettings | null {
   if (!settings) return null;
 
   // Detect if it's a global config by looking for known root keys
@@ -239,10 +249,10 @@ function resolveCustomSettings(
     'enable_nested_fields' in settings;
 
   if (isGlobalConfig) {
-    return settings as CustomSettings;
+    return settings as CustomCollectionSettings;
   }
 
   // Otherwise, treat it as a per-language map
-  const perLangSettings = settings as Record<string, CustomSettings>;
+  const perLangSettings = settings as Record<string, CustomCollectionSettings>;
   return perLangSettings[locale] || null;
 }

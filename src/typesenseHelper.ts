@@ -2,13 +2,17 @@ import { Client } from 'typesense';
 import type { CollectionCreateSchema } from 'typesense/lib/Typesense/Collections';
 import type { ConfigurationOptions } from 'typesense/lib/Typesense/Configuration';
 import type { ImportResponse } from 'typesense/lib/Typesense/Documents';
-import type { DocSearchRecord, CustomSettings } from './types';
+import type {
+  DocSearchRecord,
+  CustomCollectionSettings,
+  FieldsParams,
+} from './types';
 
 export interface TypesenseHelperOptions {
   config: ConfigurationOptions;
   aliasName: string;
   collectionNameTmp: string;
-  customSettings: CustomSettings | null;
+  customSettings: CustomCollectionSettings | null;
   locale: string;
   isVersioned: boolean;
 }
@@ -18,7 +22,7 @@ export class TypesenseHelper {
   private aliasName: string;
   private collectionNameTmp: string;
   private collectionLocale: string;
-  private customSettings: CustomSettings | null;
+  private customSettings: CustomCollectionSettings | null;
   private isVersioned: boolean;
   private typesenseVersion: number = 0;
 
@@ -58,65 +62,35 @@ export class TypesenseHelper {
     try {
       await this.typesenseClient.collections(this.collectionNameTmp).delete();
     } catch (error: any) {
-      if (error?.httpStatus !== 404) throw error;
+      if (error?.httpStatus !== 404) {
+        console.error('[TypesensePlugin] Error:');
+        throw error;
+      }
     }
 
     const schema: CollectionCreateSchema = {
       name: this.collectionNameTmp,
-      fields: [
-        { name: 'anchor', type: 'string', optional: true },
-        {
-          name: 'content',
-          type: 'string',
-          locale: this.collectionLocale,
-          optional: true,
-        },
-        { name: 'url', type: 'string', facet: true },
-        {
-          name: 'url_without_anchor',
-          type: 'string',
-          facet: true,
-          optional: true,
-        },
-        ...Array.from({ length: 7 }).map((_, i) => ({
-          name: `hierarchy.lvl${i}`,
-          type: 'string' as const,
-          facet: true,
-          locale: this.collectionLocale,
-          optional: true,
-        })),
-        {
-          name: 'type',
-          type: 'string',
-          facet: true,
-          optional: true,
-        },
-        { name: 'item_priority', type: 'int64' },
-      ],
+      fields: getDefaultCollectionFields({
+        locale: this.collectionLocale,
+        isVersioned: this.isVersioned,
+      }),
       default_sorting_field: 'item_priority',
       token_separators: ['_', '-'],
     };
-
-    // Dynamically append the version field if the project is versioned
-    if (this.isVersioned) {
-      schema.fields!.push({
-        name: 'version',
-        type: 'string[]',
-        facet: true,
-        optional: true,
-      });
-    }
 
     // Custom overrides mapping
     if (this.customSettings) {
       if (this.customSettings.token_separators) {
         schema.token_separators = this.customSettings.token_separators;
       }
+      if (this.customSettings.fields) {
+        schema.fields = this.customSettings.fields({
+          locale: this.collectionLocale,
+          isVersioned: this.isVersioned,
+        });
+      }
       if (this.customSettings.symbols_to_index) {
         schema.symbols_to_index = this.customSettings.symbols_to_index;
-      }
-      if (this.customSettings.field_definitions) {
-        schema.fields = this.customSettings.field_definitions;
       }
       if (this.customSettings.enable_nested_fields !== undefined) {
         schema.enable_nested_fields = this.customSettings.enable_nested_fields;
@@ -311,4 +285,71 @@ export class TypesenseHelper {
         .upsert(override.id, overrideKeys as any);
     }
   }
+}
+
+/**
+ * Returns the default collection fields used when creating a Typesense collection.
+ *
+ * Use this when you need to customize specific fields without redefining the entire schema.
+ * The `version` field is automatically included when `isVersioned` is `true`.
+ *
+ * @param locale - The locale used for text fields (e.g. `'en'`, `'zh'`).
+ * @param isVersioned - When `true`, appends the `version` field to the returned fields.
+ *
+ * @example
+ * // Adding a custom field while keeping defaults:
+ * customLocaleCollectionSettings: {
+ *   en: {
+ *     fields: (params) => [
+ *       ...getDefaultCollectionFields(params),
+ *       { name: 'my_custom_field', type: 'string', locale },
+ *     ],
+ *   },
+ * }
+ */
+export function getDefaultCollectionFields({
+  locale,
+  isVersioned,
+}: FieldsParams): CollectionCreateSchema['fields'] {
+  const baseFields: CollectionCreateSchema['fields'] = [
+    { name: 'anchor', type: 'string', optional: true },
+    {
+      name: 'content',
+      type: 'string',
+      locale,
+      optional: true,
+    },
+    { name: 'url', type: 'string', facet: true },
+    {
+      name: 'url_without_anchor',
+      type: 'string',
+      facet: true,
+      optional: true,
+    },
+    ...Array.from({ length: 7 }).map((_, i) => ({
+      name: `hierarchy.lvl${i}`,
+      type: 'string' as const,
+      facet: true,
+      locale,
+      optional: true,
+    })),
+    {
+      name: 'type',
+      type: 'string',
+      facet: true,
+      optional: true,
+    },
+    { name: 'item_priority', type: 'int64' },
+  ];
+
+  if (isVersioned) {
+    baseFields.push({
+      name: 'version',
+      type: 'string',
+      facet: true,
+      optional: true,
+    });
+  }
+
+  return baseFields;
 }
