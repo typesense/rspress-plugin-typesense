@@ -92,3 +92,48 @@ export const RU_LOCALES: Locales = {
     },
   },
 } as const;
+
+export const VN_LOCALES: Locales = {
+  vn: {
+    placeholder: 'Tìm kiếm tài liệu',
+    translations: {
+      button: {
+        buttonText: 'Tìm kiếm',
+        buttonAriaLabel: 'Tìm kiếm',
+      },
+      modal: {
+        searchBox: {
+          resetButtonTitle: 'Xóa truy vấn',
+          resetButtonAriaLabel: 'Xóa truy vấn',
+          cancelButtonText: 'Hủy',
+          cancelButtonAriaLabel: 'Hủy',
+        },
+        startScreen: {
+          recentSearchesTitle: 'Gần đây',
+          noRecentSearchesText: 'Chưa có tìm kiếm gần đây',
+          saveRecentSearchButtonTitle: 'Lưu tìm kiếm này',
+          removeRecentSearchButtonTitle: 'Xóa tìm kiếm này khỏi lịch sử',
+          favoriteSearchesTitle: 'Yêu thích',
+          removeFavoriteSearchButtonTitle:
+            'Xóa tìm kiếm này khỏi mục yêu thích',
+        },
+        errorScreen: {
+          titleText: 'Không thể tải kết quả',
+          helpText: 'Hãy kiểm tra lại kết nối mạng của bạn.',
+        },
+        footer: {
+          selectText: 'để chọn',
+          navigateText: 'để di chuyển',
+          closeText: 'để đóng',
+          searchByText: 'Vận hành bởi',
+        },
+        noResultsScreen: {
+          noResultsText: 'Không có kết quả cho',
+          suggestedQueryText: 'Hãy thử tìm với từ khóa',
+          reportMissingResultsText: 'Bạn nghĩ truy vấn này nên có kết quả?',
+          reportMissingResultsLinkText: 'Hãy cho chúng tôi biết.',
+        },
+      },
+    },
+  },
+} as const;
