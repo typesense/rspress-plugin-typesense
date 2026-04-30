@@ -7,6 +7,7 @@ import type {
   CustomCollectionSettings,
   FieldsParams,
 } from './types';
+import { CollectionFieldSchema } from 'typesense/lib/Typesense/Collection';
 
 export interface TypesenseHelperOptions {
   config: ConfigurationOptions;
@@ -310,8 +311,8 @@ export class TypesenseHelper {
 export function getDefaultCollectionFields({
   locale,
   isVersioned,
-}: FieldsParams): CollectionCreateSchema['fields'] {
-  const baseFields: CollectionCreateSchema['fields'] = [
+}: FieldsParams): CollectionFieldSchema[] {
+  const baseFields: CollectionFieldSchema[] = [
     { name: 'anchor', type: 'string', optional: true },
     {
       name: 'content',

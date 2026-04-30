@@ -1,3 +1,4 @@
+import { CollectionFieldSchema } from 'typesense/lib/Typesense/Collection';
 import type { CollectionCreateSchema } from 'typesense/lib/Typesense/Collections';
 export interface Hierarchy {
   [key: string]: string | null | undefined;
@@ -39,7 +40,7 @@ export interface FieldsParams {
 export interface CustomCollectionSettings {
   token_separators?: CollectionCreateSchema['token_separators'];
   symbols_to_index?: CollectionCreateSchema['symbols_to_index'];
-  fields?: (params: FieldsParams) => CollectionCreateSchema['fields'];
+  fields?: (params: FieldsParams) => CollectionFieldSchema[];
   enable_nested_fields?: CollectionCreateSchema['enable_nested_fields'];
 }
 
