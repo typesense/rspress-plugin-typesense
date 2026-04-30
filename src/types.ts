@@ -44,7 +44,7 @@ export interface CustomCollectionSettings {
   enable_nested_fields?: CollectionCreateSchema['enable_nested_fields'];
 }
 
-// Allows a single global config OR a map of configs keyed by language (e.g. { en: {...}, zh: {...} })
+/**  Allows a single global config OR a map of configs keyed by language (e.g. `{ en: {...}, zh: {...} }`) */
 export type CustomCollectionSettingsConfig =
   | CustomCollectionSettings
   | Record<string, CustomCollectionSettings>;

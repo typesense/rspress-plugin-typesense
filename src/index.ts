@@ -16,9 +16,18 @@ export type {
 
 export { getDefaultCollectionFields };
 
+/**
+ * Options for the Typesense plugin.
+ *
+ * The server configuration requires an API key with **write permissions**,
+ * as the plugin creates and manages collections during indexing.
+ */
 export interface TypesensePluginOptions {
-  typesenseOptions: ConfigurationOptions;
+  /** Typesense server connection options (host, port, protocol, API key, etc.). The API key must have write permissions. */
+  serverConfig: ConfigurationOptions;
+  /** The name of the Typesense collection to index documents into. */
   collectionName: string;
+  /** Optional per-locale or global overrides for the collection schema. */
   customCollectionSettings?: CustomCollectionSettingsConfig;
 }
 
@@ -123,7 +132,7 @@ export function pluginTypesense(
         );
 
         const helper = new TypesenseHelper({
-          config: options.typesenseOptions,
+          config: options.serverConfig,
           aliasName,
           collectionNameTmp,
           customSettings: localizedCustomSettings,
