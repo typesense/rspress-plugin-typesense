@@ -37,6 +37,7 @@ export interface FieldsParams {
   isVersioned: boolean;
 }
 
+// If rename or add any new options here, make sure to update in `resolveCustomSettings`.
 export interface CustomCollectionSettings {
   token_separators?: CollectionCreateSchema['token_separators'];
   symbols_to_index?: CollectionCreateSchema['symbols_to_index'];

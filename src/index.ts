@@ -260,10 +260,11 @@ function resolveCustomSettings(
 
   // Detect if it's a global config by looking for known root keys
   const isGlobalConfig =
-    'token_separators' in settings ||
-    'symbols_to_index' in settings ||
-    'field_definitions' in settings ||
-    'enable_nested_fields' in settings;
+    ('token_separators' satisfies keyof CustomCollectionSettings) in settings ||
+    ('symbols_to_index' satisfies keyof CustomCollectionSettings) in settings ||
+    ('fields' satisfies keyof CustomCollectionSettings) in settings ||
+    ('enable_nested_fields' satisfies keyof CustomCollectionSettings) in
+      settings;
 
   if (isGlobalConfig) {
     return settings as CustomCollectionSettings;
