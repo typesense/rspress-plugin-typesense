@@ -7,24 +7,36 @@ import type { DocSearchRecord, Hierarchy, RecordWeight } from './types';
 export class IndexFromHtml {
   private levels = ['lvl0', 'lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6'];
 
-  private selectors = {
-    lvl0: {
-      selector: '.rp-nav-menu__item--active',
-      global: true,
-    },
+  private selectors: Record<string, { selector: string; global: boolean }>;
 
-    lvl1: { selector: '.rp-doc h1', global: false },
-    lvl2: { selector: '.rp-doc h2', global: false },
-    lvl3: { selector: '.rp-doc h3', global: false },
-    lvl4: { selector: '.rp-doc h4', global: false },
-    lvl5: { selector: '.rp-doc h5', global: false },
-    lvl6: { selector: '.rp-doc h6', global: false },
-    content: {
-      selector:
-        '.rp-doc p, .rp-doc li, .rp-doc table, .rp-doc .rp-callout, .rp-doc .rp-codeblock__content .rp-codeblock__content__scroll-container',
-      global: false,
-    },
-  };
+  constructor(options?: { indexCodeBlocks?: boolean }) {
+    // Support both modern Rspress and legacy Modern.js classes
+    const docClass = '.rspress-doc';
+
+    let contentSelector = `${docClass} p, ${docClass} li, ${docClass} table, ${docClass} .rp-callout`;
+    // Dynamically append the code block selector if configured
+    if (options?.indexCodeBlocks) {
+      contentSelector += `, ${docClass} pre > code`;
+    }
+
+    this.selectors = {
+      lvl0: {
+        selector: '.rp-nav-menu__item--active',
+        global: true,
+      },
+
+      lvl1: { selector: `${docClass} h1`, global: false },
+      lvl2: { selector: `${docClass} h2`, global: false },
+      lvl3: { selector: `${docClass} h3`, global: false },
+      lvl4: { selector: `${docClass} h4`, global: false },
+      lvl5: { selector: `${docClass} h5`, global: false },
+      lvl6: { selector: `${docClass} h6`, global: false },
+      content: {
+        selector: contentSelector,
+        global: false,
+      },
+    };
+  }
 
   public getRecords(
     html: string,
@@ -32,6 +44,11 @@ export class IndexFromHtml {
     lang?: string,
   ): DocSearchRecord[] {
     const $ = cheerio.load(html);
+    // Remove badge elements to prevent their text from being indexed
+    // $('.rp-badge').remove();
+    // // Remove non-doc elements (e.g. version switcher) from h1 to keep title text clean
+    // $('.rspress-doc h1 .rp-not-doc').remove();
+
     const records: DocSearchRecord[] = [];
 
     // Helper to safely extract text from global selectors
@@ -49,7 +66,7 @@ export class IndexFromHtml {
         'Documentation',
     };
 
-    // We construct a query that selects all headers and paragraphs inside .rp-doc
+    // We construct a query that selects all headers and paragraphs inside .rspress-doc
     // in the order they appear in the DOM.
     const selectorString = Object.values(this.selectors)
       .filter((s) => !s.global)
@@ -113,11 +130,7 @@ export class IndexFromHtml {
         // Headers get priorities from 40 to 100
         levelWeight = 100 - currentLevelInt * 10;
       } else {
-        // Detect if the element is a codeblock based on Rspress classes
-        const isCodeBlock =
-          el.hasClass('rp-codeblock__content__scroll-container') ||
-          el.parents('.rp-codeblock, pre').length > 0;
-
+        const isCodeBlock = tagName === 'code' || el.parents('pre').length > 0;
         // Regular text gets 10, Code blocks get 0 (lowest priority)
         levelWeight = isCodeBlock ? 0 : 10;
       }

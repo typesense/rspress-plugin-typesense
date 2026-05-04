@@ -8,6 +8,7 @@ import type {
 } from './types';
 import { TypesenseHelper, getDefaultCollectionFields } from './typesenseHelper';
 import { IndexFromHtml } from './indexFromHtml';
+import { ImportError } from 'typesense/lib/Typesense/Errors';
 
 export type {
   CustomCollectionSettings,
@@ -29,6 +30,8 @@ export interface TypesensePluginOptions {
   collectionName: string;
   /** Optional per-locale or global overrides for the collection schema. */
   customCollectionSettings?: CustomCollectionSettingsConfig;
+  /** Whether to index code blocks into Typesense. Defaults to false to avoid search noise. */
+  indexCodeBlocks?: boolean;
 }
 
 export function pluginTypesense(
@@ -104,8 +107,9 @@ export function pluginTypesense(
         return;
       }
 
-      const extractor = new IndexFromHtml();
-
+      const extractor = new IndexFromHtml({
+        indexCodeBlocks: options.indexCodeBlocks ?? false,
+      });
       // Process each locale group into its own Typesense collection
       for (const groupKey in routeGroups) {
         const { locale, routes } = routeGroups[groupKey]!;
@@ -219,9 +223,13 @@ export function pluginTypesense(
             console.error(
               `  \x1b[31m✖\x1b[0m \x1b[37m${route.routePath}\x1b[0m ${filler} \x1b[31m failed\x1b[0m \x1b[90m(Processing error)\x1b[0m`,
             );
-            console.error(
-              `    \x1b[31m↳ ${error instanceof Error ? error.message : error}\x1b[0m`,
-            );
+            if (error instanceof ImportError) {
+              console.error(`    \x1b[31m↳ Import error\x1b[0m`);
+              console.error(error.importResults);
+            } else
+              console.error(
+                `    \x1b[31m↳ ${error instanceof Error ? error.message : error}\x1b[0m`,
+              );
           }
         }
 

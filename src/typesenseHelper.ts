@@ -202,9 +202,9 @@ export class TypesenseHelper {
       }
     }
 
-    // Handle Versions dynamically
+    // Handle Versions
     if (isVersioned && record.version && typeof record.version === 'string') {
-      transformedRecord['version'] = record.version.split(',');
+      transformedRecord['version'] = record.version;
     } else if (!isVersioned) {
       // Ensure we don't accidentally push version into the DB if not in schema
       delete transformedRecord['version'];
