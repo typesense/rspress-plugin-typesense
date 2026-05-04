@@ -50,6 +50,17 @@ export function pluginTypesense(
       generatedRoutes = routes;
     },
 
+    // Inject the configuration into the frontend via a virtual module
+    async addRuntimeModules() {
+      // DO NOT include sensitive information in this payload, as it will be exposed to the client-side.
+      const configPayload = {
+        collectionName: options.collectionName,
+      };
+      return {
+        'virtual-typesense-config': `export default ${JSON.stringify(configPayload)};`,
+      };
+    },
+
     async afterBuild(config, isProd) {
       if (!isProd) return;
 
