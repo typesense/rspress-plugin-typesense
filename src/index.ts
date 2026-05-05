@@ -32,6 +32,8 @@ export interface TypesensePluginOptions {
   customCollectionSettings?: CustomCollectionSettingsConfig;
   /** Whether to index code blocks into Typesense. Defaults to false to avoid search noise. */
   indexCodeBlocks?: boolean;
+  /** If set to true, the search UI will query the collection corresponding to the currently selected docs version, to query across all versions, set to false. Default: true */
+  versionedSearch?: boolean;
 }
 
 export function pluginTypesense(
@@ -55,6 +57,7 @@ export function pluginTypesense(
       // DO NOT include sensitive information in this payload, as it will be exposed to the client-side.
       const configPayload = {
         collectionName: options.collectionName,
+        versionedSearch: options.versionedSearch ?? true,
       };
       return {
         'virtual-typesense-config': `export default ${JSON.stringify(configPayload)};`,
@@ -68,7 +71,7 @@ export function pluginTypesense(
       const defaultLang = config.lang || 'en';
 
       // @ts-ignore
-      const isVersioned = config.search?.versioned ?? true;
+      const isVersioned = options.versionedSearch ?? true;
       const defaultVersion = config.multiVersion?.default || '';
 
       if (generatedRoutes.length === 0) {

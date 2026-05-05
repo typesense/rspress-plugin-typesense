@@ -26,12 +26,10 @@ type SearchProps = {
     typesenseSearchParameters?: DocSearchProps['typesenseSearchParameters'];
   };
   locales?: Locales;
-  versionedSearch?: boolean;
 };
 
 function Search({
   locales = {},
-  versionedSearch = true,
   docSearchProps: {
     transformItems,
     typesenseSearchParameters,
@@ -55,7 +53,7 @@ function Search({
     filters.push(`(${searchParams.filter_by})`);
   }
 
-  if (versionedSearch && version) {
+  if (typesenseConfig.versionedSearch && version) {
     filters.push(`version:=\`${version}\``);
   }
 
