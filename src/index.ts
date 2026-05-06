@@ -26,16 +26,41 @@ export { getDefaultCollectionFields };
  * as the plugin creates and manages collections during indexing.
  */
 export interface TypesensePluginOptions {
-  /** Typesense server connection options (host, port, protocol, API key, etc.). The API key must have write permissions. */
+  /**
+   * Typesense server connection options.
+   * The API key must have write permissions to create and index collections.
+   */
   serverConfig: ConfigurationOptions;
-  /** The name of the Typesense collection to index documents into. */
+
+  /**
+   * The base name of the Typesense collection.
+   * Note: The plugin creates dedicated localized collections (e.g., `my_docs_en`).
+   */
   collectionName: string;
-  /** Optional per-locale or global overrides for the collection schema. */
+
+  /**
+   * Optional schema overrides. Can be a global settings object or a map keyed by language.
+   */
   customCollectionSettings?: CustomCollectionSettingsConfig;
-  /** Whether to index code blocks into Typesense. Defaults to false to avoid search noise. */
+
+  /**
+   * Whether to index code blocks into Typesense.
+   * Defaults to `false` to avoid search noise and bloated index sizes.
+   */
   indexCodeBlocks?: boolean;
-  /** If set to true, the search UI will query the collection corresponding to the currently selected docs version, to query across all versions, set to false. Default: true */
+
+  /**
+   * Whether a failed indexing attempt should crash the build process.
+   * Defaults to `true`.
+   */
+  failOnIndexError?: boolean;
+
+  /**
+   * Whether to automatically filter search results by the active documentation version.
+   * Defaults to `true`.
+   */
   versionedSearch?: boolean;
+
   /**
    * Hook to mutate or enrich the record before it gets indexed.
    * Useful for attaching custom fields or tags.
@@ -168,8 +193,26 @@ export function pluginTypesense(
           isVersioned,
         });
 
-        await helper.init();
-        await helper.createTmpCollection();
+        try {
+          await helper.init();
+          await helper.createTmpCollection();
+        } catch (error) {
+          console.error(
+            `\n\x1b[31m✖ [TypesensePlugin] Failed to initialize/create collection:\x1b[0m \x1b[37m${collectionNameTmp}\x1b[0m`,
+          );
+          console.error(
+            `  \x1b[31m↳ ${error instanceof Error ? error.message : error}\x1b[0m\n`,
+          );
+
+          if (options.failOnIndexError !== false) {
+            throw error; // Crash the build
+          } else {
+            console.warn(
+              `\x1b[33m⚠ [TypesensePlugin] Skipping group indexing due to failOnIndexError=false.\x1b[0m`,
+            );
+            continue; // Move to the next locale group instead of crashing
+          }
+        }
 
         let totalRecords = 0;
         // Process each route's HTML File
@@ -257,10 +300,19 @@ export function pluginTypesense(
             if (error instanceof ImportError) {
               console.error(`    \x1b[31m↳ Import error\x1b[0m`);
               console.error(error.importResults);
-            } else
+
+              // If it's a structural DB import error and failOnIndexError is true, crash here.
+              if (options.failOnIndexError !== false) {
+                throw error;
+              }
+              console.warn(
+                `\x1b[33m⚠ [TypesensePlugin] Skipping failure due to failOnIndexError=false.\x1b[0m`,
+              );
+            } else {
               console.error(
                 `    \x1b[31m↳ ${error instanceof Error ? error.message : error}\x1b[0m`,
               );
+            }
           }
         }
 
@@ -272,10 +324,19 @@ export function pluginTypesense(
           );
         } catch (error) {
           console.error(
-            `[TypesensePlugin] Failed to commit collection ${aliasName}:`,
-            error,
+            `\n\x1b[31m✖ [TypesensePlugin] Failed to commit collection:\x1b[0m \x1b[37m${aliasName}\x1b[0m`,
           );
-          throw error;
+          console.error(
+            `  \x1b[31m↳ ${error instanceof Error ? error.message : error}\x1b[0m\n`,
+          );
+
+          if (options.failOnIndexError !== false) {
+            throw error; // Crash the build
+          } else {
+            console.warn(
+              `\x1b[33m⚠ [TypesensePlugin] Skipping failure due to failOnIndexError=false.\x1b[0m`,
+            );
+          }
         }
       }
     },
