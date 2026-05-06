@@ -5,6 +5,7 @@ import type { ConfigurationOptions } from 'typesense/lib/Typesense/Configuration
 import type {
   CustomCollectionSettings,
   CustomCollectionSettingsConfig,
+  DocSearchRecord,
 } from './types';
 import { TypesenseHelper, getDefaultCollectionFields } from './typesenseHelper';
 import { IndexFromHtml } from './indexFromHtml';
@@ -13,6 +14,7 @@ import { ImportError } from 'typesense/lib/Typesense/Errors';
 export type {
   CustomCollectionSettings,
   CustomCollectionSettingsConfig,
+  DocSearchRecord,
 } from './types';
 
 export { getDefaultCollectionFields };
@@ -34,6 +36,14 @@ export interface TypesensePluginOptions {
   indexCodeBlocks?: boolean;
   /** If set to true, the search UI will query the collection corresponding to the currently selected docs version, to query across all versions, set to false. Default: true */
   versionedSearch?: boolean;
+  /**
+   * Hook to mutate or enrich the record before it gets indexed.
+   * Useful for attaching custom fields or tags.
+   */
+  transformRecord?: (
+    record: DocSearchRecord,
+    route: RouteMeta,
+  ) => DocSearchRecord;
 }
 
 export function pluginTypesense(
@@ -210,7 +220,7 @@ export function pluginTypesense(
           try {
             const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
 
-            const records = extractor.getRecords(
+            let records = extractor.getRecords(
               htmlContent,
               route.routePath,
               locale,
@@ -218,6 +228,13 @@ export function pluginTypesense(
 
             if (isVersioned && version) {
               records.forEach((r) => ((r as any).version = version));
+            }
+
+            // Allow users to inject custom data or mutate the record
+            if (options.transformRecord) {
+              records = records.map((record) =>
+                options.transformRecord!(record, route),
+              );
             }
 
             if (records.length > 0) {

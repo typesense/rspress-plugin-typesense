@@ -1,6 +1,6 @@
 import * as path from 'node:path';
 import { defineConfig } from '@rspress/core';
-import { pluginTypesense } from '../src/index';
+import { getDefaultCollectionFields, pluginTypesense } from '../src';
 
 export default defineConfig({
   lang: 'en',
@@ -22,15 +22,23 @@ export default defineConfig({
   plugins: [
     pluginTypesense({
       collectionName: 'rspress_docs',
-      typesenseOptions: {
+      serverConfig: {
         nodes: [
           {
-            host: 'localhost',
-            port: 8108,
-            protocol: 'http',
+            url: 'http://localhost:8108',
           },
         ],
         apiKey: 'xyz',
+      },
+      customCollectionSettings: {
+        fields: (params) => {
+          return getDefaultCollectionFields(params);
+        },
+      },
+      indexCodeBlocks: true,
+      transformRecord(record, route) {
+        record['my_custom_field'] = 'hello';
+        return record;
       },
     }),
   ],

@@ -1,26 +1,20 @@
 import './index.css';
 
-import { Search as PluginTypesenseSearch } from '../../src/runtime/Search';
+import { Search as PluginTypesenseSearch, VN_LOCALES } from '../../src/runtime';
 
 const Search = () => {
   return (
     <PluginTypesenseSearch
+      locales={{...VN_LOCALES}}
       docSearchProps={{
-        typesenseCollectionName: 'rspress_docs',
         typesenseServerConfig: {
-          nodes: [
-            {
-              host: 'localhost',
-              port: 8108,
-              protocol: 'http',
-            },
-          ],
+          nodes: [{ url: 'http://localhost:8108'}],
           apiKey: 'xyz',
         },
-        typesenseSearchParameters: {},
       }}
     />
   );
 };
+
 export { Search };
 export * from '@rspress/core/theme-original';
