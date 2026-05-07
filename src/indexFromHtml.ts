@@ -13,7 +13,7 @@ export class IndexFromHtml {
     // Support both modern Rspress and legacy Modern.js classes
     const docClass = '.rspress-doc';
 
-    let contentSelector = `${docClass} p, ${docClass} li, ${docClass} table, ${docClass} .rp-callout`;
+    let contentSelector = `${docClass} p, ${docClass} li, ${docClass} td, ${docClass} th`;
     // Dynamically append the code block selector if configured
     if (options?.indexCodeBlocks) {
       contentSelector += `, ${docClass} pre > code`;
@@ -45,9 +45,9 @@ export class IndexFromHtml {
   ): DocSearchRecord[] {
     const $ = cheerio.load(html);
     // Remove badge elements to prevent their text from being indexed
-    // $('.rp-badge').remove();
-    // // Remove non-doc elements (e.g. version switcher) from h1 to keep title text clean
-    // $('.rspress-doc h1 .rp-not-doc').remove();
+    $('.rp-badge').remove();
+    // Remove non-doc elements (e.g. version switcher) from h1 to keep title text clean
+    $('.rspress-doc h1 .rp-not-doc').remove();
 
     const records: DocSearchRecord[] = [];
 

@@ -1,4 +1,3 @@
-
 import type { DocSearchProps } from 'typesense-docsearch-react';
 import { DocSearch } from 'typesense-docsearch-react';
 import { useLang, useNavigate, useVersion } from '@rspress/core/runtime';
@@ -20,11 +19,16 @@ const safeEscapeHighlights = (str: string) => {
     .replace(/(?<!<mark|<\/mark)>/gi, '&gt;');
 };
 
+export type TypesenseDocSearchProps = Omit<
+  DocSearchProps,
+  'translations' | 'typesenseCollectionName' | 'typesenseSearchParameters'
+> & {
+  typesenseSearchParameters?: DocSearchProps['typesenseSearchParameters'];
+};
+
 type SearchProps = {
   // Make typesenseCollectionName optional since we auto-inject it via virtual module
-  docSearchProps: Omit<DocSearchProps, 'translations' | 'typesenseCollectionName' | 'typesenseSearchParameters'> & {
-    typesenseSearchParameters?: DocSearchProps['typesenseSearchParameters'];
-  };
+  docSearchProps: TypesenseDocSearchProps;
   locales?: Locales;
 };
 
