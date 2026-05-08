@@ -46,8 +46,8 @@ export class IndexFromHtml {
     const $ = cheerio.load(html);
     // Remove badge elements to prevent their text from being indexed
     $('.rp-badge').remove();
-    // Remove non-doc elements (e.g. version switcher) from h1 to keep title text clean
-    $('.rspress-doc h1 .rp-not-doc').remove();
+    // Remove non-doc elements (e.g. version switcher) to keep title text clean
+    $('.rp-not-doc').remove();
 
     const records: DocSearchRecord[] = [];
 
