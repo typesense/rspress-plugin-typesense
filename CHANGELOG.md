@@ -1,5 +1,11 @@
 # rspress-plugin-typesense
 
+## 0.0.3
+
+### Patch Changes
+
+- explicit typesense dependency version
+
 ## 0.0.2
 
 ### Patch Changes

@@ -1,7 +1,7 @@
 {
   "name": "rspress-plugin-typesense",
   "description": "A plugin that adds lightning-fast, typo-tolerant, Typesense-powered search to your Rspress site",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "exports": {
     ".": {
@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "cheerio": "^1.2.0",
+    "typesense": "^3.0.6",
     "typesense-docsearch-css": "^0.4.1",
     "typesense-docsearch-react": "^3.4.1"
   },
