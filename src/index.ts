@@ -50,12 +50,6 @@ export interface TypesensePluginOptions {
   indexCodeBlocks?: boolean;
 
   /**
-   * Whether a failed indexing attempt should crash the build process.
-   * Defaults to `true`.
-   */
-  failOnIndexError?: boolean;
-
-  /**
    * Whether to automatically filter search results by the active documentation version.
    * Defaults to `true`.
    */
@@ -204,14 +198,8 @@ export function pluginTypesense(
             `  \x1b[31m↳ ${error instanceof Error ? error.message : error}\x1b[0m\n`,
           );
 
-          if (options.failOnIndexError !== false) {
-            throw error; // Crash the build
-          } else {
-            console.warn(
-              `\x1b[33m⚠ [TypesensePlugin] Skipping group indexing due to failOnIndexError=false.\x1b[0m`,
-            );
-            continue; // Move to the next locale group instead of crashing
-          }
+          await helper.discardTmpCollection();
+          throw error;
         }
 
         let totalRecords = 0;
@@ -257,7 +245,8 @@ export function pluginTypesense(
             console.warn(
               `  \x1b[33m⚠\x1b[0m \x1b[37m${route.routePath}\x1b[0m ${filler} \x1b[33mskipped\x1b[0m \x1b[90m(HTML not found)\x1b[0m`,
             );
-            continue;
+            await helper.discardTmpCollection();
+            throw new Error(`HTML not found for route ${route.routePath}`);
           }
 
           try {
@@ -300,26 +289,14 @@ export function pluginTypesense(
             if (error instanceof ImportError) {
               console.error(`    \x1b[31m↳ Import error\x1b[0m`);
               console.error(error.importResults);
-
-              // If it's a structural DB import error and failOnIndexError is true, crash here.
-              if (options.failOnIndexError !== false) {
-                throw error;
-              }
-              console.warn(
-                `\x1b[33m⚠ [TypesensePlugin] Skipping failure due to failOnIndexError=false.\x1b[0m`,
-              );
             } else {
               console.error(
                 `    \x1b[31m↳ ${error instanceof Error ? error.message : error}\x1b[0m`,
               );
-
-              if (options.failOnIndexError !== false) {
-                throw error;
-              }
-              console.warn(
-                `\x1b[33m⚠ [TypesensePlugin] Skipping failure due to failOnIndexError=false.\x1b[0m`,
-              );
             }
+
+            await helper.discardTmpCollection();
+            throw error;
           }
         }
 
@@ -337,13 +314,7 @@ export function pluginTypesense(
             `  \x1b[31m↳ ${error instanceof Error ? error.message : error}\x1b[0m\n`,
           );
 
-          if (options.failOnIndexError !== false) {
-            throw error; // Crash the build
-          } else {
-            console.warn(
-              `\x1b[33m⚠ [TypesensePlugin] Skipping failure due to failOnIndexError=false.\x1b[0m`,
-            );
-          }
+          throw error;
         }
       }
     },

@@ -143,20 +143,59 @@ export class TypesenseHelper {
     return recordCount;
   }
 
-  public async commitTmpCollection(): Promise<void> {
-    const oldCollectionName = await this.getOldCollectionName();
-
-    if (oldCollectionName) {
-      await this.transferSynonyms(oldCollectionName);
-      await this.transferOverrides(oldCollectionName);
+  public async discardTmpCollection(): Promise<void> {
+    try {
+      await this.typesenseClient.collections(this.collectionNameTmp).delete();
+    } catch (error: any) {
+      if (error?.httpStatus !== 404) throw error;
     }
+  }
 
-    await this.typesenseClient.aliases().upsert(this.aliasName, {
-      collection_name: this.collectionNameTmp,
-    });
+  public async commitTmpCollection(): Promise<void> {
+    let oldCollectionName: string | null = null;
+    let aliasUpdated = false;
 
-    if (oldCollectionName) {
-      await this.typesenseClient.collections(oldCollectionName).delete();
+    try {
+      oldCollectionName = await this.getOldCollectionName();
+
+      if (oldCollectionName) {
+        await this.transferSynonyms(oldCollectionName);
+        await this.transferOverrides(oldCollectionName);
+      }
+
+      await this.typesenseClient.aliases().upsert(this.aliasName, {
+        collection_name: this.collectionNameTmp,
+      });
+      aliasUpdated = true;
+
+      if (oldCollectionName) {
+        await this.typesenseClient.collections(oldCollectionName).delete();
+      }
+    } catch (error) {
+      try {
+        if (aliasUpdated) {
+          if (oldCollectionName) {
+            await this.typesenseClient.aliases().upsert(this.aliasName, {
+              collection_name: oldCollectionName,
+            });
+          } else {
+            await this.typesenseClient.aliases(this.aliasName).delete();
+          }
+        }
+
+        await this.discardTmpCollection();
+      } catch (rollbackError) {
+        const message =
+          rollbackError instanceof Error
+            ? rollbackError.message
+            : String(rollbackError);
+        throw new Error(
+          `Failed to roll back collection commit for ${this.aliasName}: ${message}`,
+          { cause: rollbackError },
+        );
+      }
+
+      throw error;
     }
   }
 

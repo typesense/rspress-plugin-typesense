@@ -109,12 +109,6 @@ export interface TypesensePluginOptions {
   indexCodeBlocks?: boolean;
 
   /**
-   * Whether a failed indexing attempt should crash the build process.
-   * Defaults to `true`.
-   */
-  failOnIndexError?: boolean;
-
-  /**
    * Whether to automatically filter search results by the active documentation version.
    * Defaults to `true`.
    */
@@ -194,13 +188,6 @@ In the frontend, you could now pass `typesenseSearchParams: { filter_by: 'catego
 - **Default**: `false`
 
 By default, the plugin only indexes headers (`h1-h6`), paragraphs, lists and tables. Enabling this will also extract text from inside code blocks.
-
-### failOnIndexError
-
-- **Type**: `boolean`
-- **Default**: `true`
-
-By default, if the Typesense indexing step fails (e.g., network timeout), the build process will crash. Set this to `false` if you want your CI/CD deployments to succeed even if search indexing fails.
 
 ### versionedSearch
 

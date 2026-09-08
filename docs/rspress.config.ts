@@ -43,7 +43,6 @@ export default defineConfig({
         record['my_custom_field'] = 'hello';
         return record;
       },
-      failOnIndexError: true,
       versionedSearch: true,
     }),
   ],
