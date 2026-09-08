@@ -1,6 +1,9 @@
 import * as path from 'node:path';
 import { defineConfig } from '@rspress/core';
-import { getDefaultCollectionFields, pluginTypesense } from '../src';
+import {
+  getDefaultCollectionFields,
+  pluginTypesense,
+} from 'rspress-plugin-typesense';
 
 export default defineConfig({
   lang: 'en',
@@ -40,6 +43,8 @@ export default defineConfig({
         record['my_custom_field'] = 'hello';
         return record;
       },
+      failOnIndexError: true,
+      versionedSearch: true,
     }),
   ],
   root: path.join(__dirname, 'docs'),

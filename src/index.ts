@@ -312,6 +312,13 @@ export function pluginTypesense(
               console.error(
                 `    \x1b[31m↳ ${error instanceof Error ? error.message : error}\x1b[0m`,
               );
+
+              if (options.failOnIndexError !== false) {
+                throw error;
+              }
+              console.warn(
+                `\x1b[33m⚠ [TypesensePlugin] Skipping failure due to failOnIndexError=false.\x1b[0m`,
+              );
             }
           }
         }

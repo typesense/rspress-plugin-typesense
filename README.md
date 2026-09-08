@@ -265,6 +265,17 @@ import { Search as PluginTypesenseSearch } from 'rspress-plugin-typesense/runtim
 />;
 ```
 
+## Integration tests
+
+Integration tests use Rstest and require a running Typesense instance. Start Typesense and run the suite:
+
+```bash
+docker compose up -d
+bun run test:integration
+```
+
+The suite builds the package, installs the generated npm tarball into a temporary copy of `docs`, builds the Rspress site, and verifies the indexed locale collections and version-filtered search results.
+
 ## License
 
 Licensed under the Apache 2.0 License, Copyright © Typesense.

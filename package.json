@@ -19,10 +19,13 @@
   ],
   "scripts": {
     "build": "rslib build",
-    "dev": "rslib build --watch"
+    "dev": "rslib build --watch",
+    "typecheck": "tsc --noEmit",
+    "test:integration": "rstest"
   },
   "devDependencies": {
     "@rslib/core": "^0.20.1",
+    "@rstest/core": "0.11.11",
     "@types/node": "^24.12.0",
     "rsbuild-plugin-publint": "^0.3.4",
     "typescript": "^6.0.2"
