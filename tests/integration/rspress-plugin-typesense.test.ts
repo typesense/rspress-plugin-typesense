@@ -1,5 +1,12 @@
 import { execFile } from 'node:child_process';
-import { cp, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import {
+  cp,
+  mkdir,
+  mkdtemp,
+  readFile,
+  rm,
+  writeFile,
+} from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
@@ -63,27 +70,35 @@ async function buildDocsWithCurrentPackage() {
     });
 
     const { stdout } = await run(
-      'npm',
-      [
-        'pack',
-        '--cache',
-        path.join(packageDir, 'npm-cache'),
-        '--pack-destination',
-        packageDir,
-        '--silent',
-      ],
+      'bun',
+      ['pm', 'pack', '--destination', packageDir, '--quiet'],
       repositoryRoot,
     );
-    const packageName = stdout.trim().split(/\r?\n/).at(-1);
+    const packageOutput = stdout.trim().split(/\r?\n/).at(-1);
 
-    if (!packageName) {
-      throw new Error('npm pack did not return an archive name');
+    if (!packageOutput) {
+      throw new Error('bun pm pack did not return an archive name');
     }
 
-    const packageArchive = path.join(packageDir, packageName);
+    const packageArchive = path.isAbsolute(packageOutput)
+      ? packageOutput
+      : path.join(packageDir, packageOutput);
 
-    await run('bun', ['install', '--frozen-lockfile'], docsWorkspace);
-    await run('bun', ['add', '--no-save', packageArchive], docsWorkspace);
+    const packageJsonPath = path.join(docsWorkspace, 'package.json');
+    const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf8')) as {
+      dependencies?: Record<string, string>;
+    };
+
+    packageJson.dependencies = {
+      ...packageJson.dependencies,
+      'rspress-plugin-typesense': `file:${packageArchive}`,
+    };
+
+    await writeFile(
+      packageJsonPath,
+      `${JSON.stringify(packageJson, null, 2)}\n`,
+    );
+    await run('bun', ['install'], docsWorkspace);
     await run('bun', ['run', 'build'], docsWorkspace);
   } finally {
     await Promise.all([
