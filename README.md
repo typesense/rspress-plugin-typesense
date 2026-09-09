@@ -252,7 +252,30 @@ import { Search as PluginTypesenseSearch } from 'rspress-plugin-typesense/runtim
 />;
 ```
 
-## Integration tests
+## Local development
+
+Install dependencies and watch the library for changes:
+
+```bash
+bun install
+bun run dev
+```
+
+In a second terminal, start the example Rspress site:
+
+```bash
+cd docs
+bun install
+bun run dev
+```
+
+If you want to test indexing and search locally, start Typesense as well:
+
+```bash
+docker compose up -d
+```
+
+### Integration tests
 
 Integration tests use Rstest and require a running Typesense instance. Start Typesense and run the suite:
 
@@ -261,7 +284,7 @@ docker compose up -d
 bun run test:integration
 ```
 
-The suite builds the package, installs the generated npm tarball into a temporary copy of `docs`, builds the Rspress site, and verifies the indexed locale collections and version-filtered search results.
+The suite builds the package, installs the generated bun tarball into a temporary copy of `docs`, builds the Rspress site, and verifies the results from the Typesense Docker instance.
 
 ## License
 
