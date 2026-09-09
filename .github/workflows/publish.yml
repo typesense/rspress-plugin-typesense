@@ -37,5 +37,5 @@ jobs:
       - name: Build package
         run: bun run build
 
-      - name: Publish package
-        run: npm publish --provenance
+      - name: Stage package for npm
+        run: npm stage publish --provenance
