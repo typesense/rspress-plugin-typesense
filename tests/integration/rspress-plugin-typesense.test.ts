@@ -1,12 +1,5 @@
 import { execFile } from 'node:child_process';
-import {
-  cp,
-  mkdir,
-  mkdtemp,
-  readFile,
-  rm,
-  writeFile,
-} from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
@@ -129,7 +122,7 @@ describe('Rspress plugin Typesense integration', () => {
   });
 
   test('indexes a non-empty collection for each configured locale', async () => {
-    for (const alias of ['rspress_docs_en', 'rspress_docs_vn']) {
+    for (const alias of ['rspress_docs_en', 'rspress_docs_vi']) {
       const aliasRecord = await typesenseClient.aliases(alias).retrieve();
       expect(aliasRecord.collection_name).toBeTruthy();
 
@@ -141,7 +134,7 @@ describe('Rspress plugin Typesense integration', () => {
   });
 
   test('returns results for every configured documentation version', async () => {
-    for (const alias of ['rspress_docs_en', 'rspress_docs_vn']) {
+    for (const alias of ['rspress_docs_en', 'rspress_docs_vi']) {
       const { collection_name: collectionName } = await typesenseClient
         .aliases(alias)
         .retrieve();
