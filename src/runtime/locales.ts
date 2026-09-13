@@ -1,9 +1,27 @@
 import type { DocSearchProps } from 'typesense-docsearch-react';
 
-export type Locales = Record<
-  string,
-  { translations: DocSearchProps['translations']; placeholder: string }
+/**
+ * Recursively removes `?` and `undefined` from all nested properties
+ */
+type DeepRequired<T> = T extends (...args: any[]) => any
+  ? T
+  : T extends readonly (infer U)[]
+    ? readonly DeepRequired<NonNullable<U>>[]
+    : T extends object
+      ? { [K in keyof T]-?: DeepRequired<NonNullable<T[K]>> }
+      : NonNullable<T>;
+
+// Make the translations fully required
+export type RequiredTranslations = DeepRequired<
+  NonNullable<DocSearchProps['translations']>
 >;
+
+export type LocaleConfig = {
+  translations: RequiredTranslations;
+  placeholder: string;
+};
+
+export type Locales = Record<string, LocaleConfig>;
 
 export const ZH_LOCALES: Locales = {
   zh: {
@@ -15,10 +33,13 @@ export const ZH_LOCALES: Locales = {
       },
       modal: {
         searchBox: {
-          resetButtonTitle: '清除查询条件',
-          resetButtonAriaLabel: '清除查询条件',
-          cancelButtonText: '取消',
-          cancelButtonAriaLabel: '取消',
+          clearButtonTitle: '清除查询条件',
+          clearButtonAriaLabel: '清除查询条件',
+          closeButtonText: '取消',
+          closeButtonAriaLabel: '取消',
+          placeholderText: '搜索文档',
+          enterKeyHint: 'search',
+          searchInputLabel: '搜索',
         },
         startScreen: {
           recentSearchesTitle: '搜索历史',
@@ -34,8 +55,15 @@ export const ZH_LOCALES: Locales = {
         },
         footer: {
           selectText: '选择',
+          submitQuestionText: '提交问题',
+          selectKeyAriaLabel: '回车键',
           navigateText: '切换',
+          navigateUpKeyAriaLabel: '向上箭头',
+          navigateDownKeyAriaLabel: '向下箭头',
           closeText: '关闭',
+          backToSearchText: '返回搜索',
+          closeKeyAriaLabel: 'Esc 键',
+          poweredByText: '由…提供支持',
           searchByText: '搜索提供者',
         },
         noResultsScreen: {
@@ -43,6 +71,22 @@ export const ZH_LOCALES: Locales = {
           suggestedQueryText: '你可以尝试查询',
           reportMissingResultsText: '你认为该查询应该有结果？',
           reportMissingResultsLinkText: '点击反馈',
+        },
+        facets: {
+          defaultValueLabel: '全部',
+          facetMenuTriggerAriaLabel: '筛选菜单',
+          clearAllLabel: '清除全部',
+          facetsAriaLabel: '筛选条件',
+          selectedFacetsAriaLabel: '已选筛选条件',
+          clearFacetAriaLabel: '清除筛选',
+        },
+        resultsScreen: {
+          askAiPlaceholder: '询问 AI：',
+          noResultsAskAiPlaceholder: '文档里没找到？让 AI 帮忙：',
+          resultsSectionTitle: '搜索结果',
+          askAiResultsTitle: 'AI 回答',
+          resultBadgeLabelText: '分类',
+          recentConversationTimestampFallback: '刚刚',
         },
       },
     },
@@ -59,10 +103,13 @@ export const RU_LOCALES: Locales = {
       },
       modal: {
         searchBox: {
-          resetButtonTitle: 'Очистить поиск',
-          resetButtonAriaLabel: 'Очистить поиск',
-          cancelButtonText: 'Закрыть',
-          cancelButtonAriaLabel: 'Закрыть',
+          clearButtonTitle: 'Очистить поиск',
+          clearButtonAriaLabel: 'Очистить поиск',
+          closeButtonText: 'Закрыть',
+          closeButtonAriaLabel: 'Закрыть',
+          placeholderText: 'Поиск в документации',
+          enterKeyHint: 'search',
+          searchInputLabel: 'Поиск',
         },
         startScreen: {
           recentSearchesTitle: 'История поиска',
@@ -78,8 +125,15 @@ export const RU_LOCALES: Locales = {
         },
         footer: {
           selectText: 'выбрать',
+          submitQuestionText: 'Задать вопрос',
+          selectKeyAriaLabel: 'Клавиша Enter',
           navigateText: 'перейти',
+          navigateUpKeyAriaLabel: 'Стрелка вверх',
+          navigateDownKeyAriaLabel: 'Стрелка вниз',
           closeText: 'закрыть',
+          backToSearchText: 'Назад к поиску',
+          closeKeyAriaLabel: 'Клавиша Escape',
+          poweredByText: 'При поддержке',
           searchByText: 'поиск от',
         },
         noResultsScreen: {
@@ -87,6 +141,22 @@ export const RU_LOCALES: Locales = {
           suggestedQueryText: 'Попробуйте изменить запрос',
           reportMissingResultsText: 'Считаете, что результаты должны быть?',
           reportMissingResultsLinkText: 'Сообщите об этом',
+        },
+        facets: {
+          defaultValueLabel: 'Все',
+          facetMenuTriggerAriaLabel: 'Меню фильтров',
+          clearAllLabel: 'Очистить все',
+          facetsAriaLabel: 'Фильтры',
+          selectedFacetsAriaLabel: 'Выбранные фильтры',
+          clearFacetAriaLabel: 'Удалить фильтр',
+        },
+        resultsScreen: {
+          askAiPlaceholder: 'Спросить AI: ',
+          noResultsAskAiPlaceholder: 'Не нашли в документации? Спросите AI: ',
+          resultsSectionTitle: 'Результаты',
+          askAiResultsTitle: 'Ответ AI',
+          resultBadgeLabelText: 'Категория',
+          recentConversationTimestampFallback: 'Недавно',
         },
       },
     },
@@ -103,10 +173,13 @@ export const VN_LOCALES: Locales = {
       },
       modal: {
         searchBox: {
-          resetButtonTitle: 'Xóa truy vấn',
-          resetButtonAriaLabel: 'Xóa truy vấn',
-          cancelButtonText: 'Hủy',
-          cancelButtonAriaLabel: 'Hủy',
+          clearButtonTitle: 'Xóa truy vấn',
+          clearButtonAriaLabel: 'Xóa truy vấn',
+          closeButtonText: 'Hủy',
+          closeButtonAriaLabel: 'Hủy',
+          placeholderText: 'Tìm kiếm tài liệu',
+          enterKeyHint: 'search',
+          searchInputLabel: 'Tìm kiếm',
         },
         startScreen: {
           recentSearchesTitle: 'Gần đây',
@@ -123,8 +196,15 @@ export const VN_LOCALES: Locales = {
         },
         footer: {
           selectText: 'để chọn',
+          submitQuestionText: 'Gửi câu hỏi',
+          selectKeyAriaLabel: 'Phím Enter',
           navigateText: 'để di chuyển',
+          navigateUpKeyAriaLabel: 'Mũi tên lên',
+          navigateDownKeyAriaLabel: 'Mũi tên xuống',
           closeText: 'để đóng',
+          backToSearchText: 'Quay lại tìm kiếm',
+          closeKeyAriaLabel: 'Phím Escape',
+          poweredByText: 'Vận hành bởi',
           searchByText: 'Vận hành bởi',
         },
         noResultsScreen: {
@@ -132,6 +212,22 @@ export const VN_LOCALES: Locales = {
           suggestedQueryText: 'Hãy thử tìm với từ khóa',
           reportMissingResultsText: 'Bạn nghĩ truy vấn này nên có kết quả?',
           reportMissingResultsLinkText: 'Hãy cho chúng tôi biết.',
+        },
+        facets: {
+          defaultValueLabel: 'Tất cả',
+          facetMenuTriggerAriaLabel: 'Menu bộ lọc',
+          clearAllLabel: 'Xóa tất cả',
+          facetsAriaLabel: 'Bộ lọc',
+          selectedFacetsAriaLabel: 'Các bộ lọc đã chọn',
+          clearFacetAriaLabel: 'Xóa bộ lọc',
+        },
+        resultsScreen: {
+          askAiPlaceholder: 'Hỏi AI: ',
+          noResultsAskAiPlaceholder: 'Không tìm thấy trong tài liệu? Hỏi AI: ',
+          resultsSectionTitle: 'Kết quả tìm kiếm',
+          askAiResultsTitle: 'Câu trả lời từ AI',
+          resultBadgeLabelText: 'Danh mục',
+          recentConversationTimestampFallback: 'Vừa xong',
         },
       },
     },
