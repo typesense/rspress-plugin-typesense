@@ -11,19 +11,24 @@ type DeepRequired<T> = T extends (...args: any[]) => any
       ? { [K in keyof T]-?: DeepRequired<NonNullable<T[K]>> }
       : NonNullable<T>;
 
-// Make the translations fully required
 export type RequiredTranslations = DeepRequired<
   NonNullable<DocSearchProps['translations']>
 >;
 
-export type LocaleConfig = {
-  translations: RequiredTranslations;
+export type StrictLocaleConfig = {
   placeholder: string;
+  translations: RequiredTranslations;
 };
 
+export type LocaleConfig = {
+  placeholder: string;
+  translations?: DocSearchProps['translations'];
+};
+
+export type StrictLocales = Record<string, StrictLocaleConfig>;
 export type Locales = Record<string, LocaleConfig>;
 
-export const ZH_LOCALES: Locales = {
+export const ZH_LOCALES: StrictLocales = {
   zh: {
     placeholder: '搜索文档',
     translations: {
@@ -93,7 +98,7 @@ export const ZH_LOCALES: Locales = {
   },
 } as const;
 
-export const RU_LOCALES: Locales = {
+export const RU_LOCALES: StrictLocales = {
   ru: {
     placeholder: 'Поиск в документации',
     translations: {
@@ -163,7 +168,7 @@ export const RU_LOCALES: Locales = {
   },
 } as const;
 
-export const VN_LOCALES: Locales = {
+export const VN_LOCALES: StrictLocales = {
   vn: {
     placeholder: 'Tìm kiếm tài liệu',
     translations: {
