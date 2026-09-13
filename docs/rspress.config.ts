@@ -16,7 +16,7 @@ export default defineConfig({
       description: 'Static Site Generator',
     },
     {
-      lang: 'vn',
+      lang: 'vi',
       label: 'Tiếng Việt',
       title: 'Rspress',
       description: 'Static Site Generator',

@@ -168,8 +168,8 @@ export const RU_LOCALES: StrictLocales = {
   },
 } as const;
 
-export const VN_LOCALES: StrictLocales = {
-  vn: {
+export const VI_LOCALES: StrictLocales = {
+  vi: {
     placeholder: 'Tìm kiếm tài liệu',
     translations: {
       button: {
