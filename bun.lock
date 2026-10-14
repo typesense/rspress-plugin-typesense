@@ -6,9 +6,9 @@
       "name": "rspress-plugin-typesense",
       "dependencies": {
         "cheerio": "^1.2.0",
-        "typesense": "^3.0.6",
-        "typesense-docsearch-css": "5.0.2-0",
-        "typesense-docsearch-react": "5.0.2-0",
+        "typesense": "3.1.1",
+        "typesense-docsearch-css": "5.0.2-3",
+        "typesense-docsearch-react": "5.0.2-3",
       },
       "devDependencies": {
         "@rslib/core": "^0.20.1",
@@ -85,7 +85,7 @@
 
     "@ast-grep/napi-win32-x64-msvc": ["@ast-grep/napi-win32-x64-msvc@0.37.0", "", { "os": "win32", "cpu": "x64" }, "sha512-vCiFOT3hSCQuHHfZ933GAwnPzmL0G04JxQEsBRfqONywyT8bSdDc/ECpAfr3S9VcS4JZ9/F6tkePKW/Om2Dq2g=="],
 
-    "@babel/runtime": ["@babel/runtime@7.29.2", "", {}, "sha512-JiDShH45zKHWyGe4ZNVRrCjBz8Nh9TMmZG1kh4QTK8hCBTWBi8Da+i7s1fJw7/lYpM4ccepSNfqzZ/QvABBi5g=="],
+    "@babel/runtime": ["@babel/runtime@7.29.7", "", {}, "sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw=="],
 
     "@base-ui/react": ["@base-ui/react@1.8.0", "", { "dependencies": { "@babel/runtime": "^7.29.7", "@base-ui/utils": "0.4.0", "@floating-ui/react-dom": "^2.1.9", "@floating-ui/utils": "^0.2.12", "use-sync-external-store": "^1.6.0" }, "peerDependencies": { "@date-fns/tz": "^1.2.0", "@types/react": "^17 || ^18 || ^19", "date-fns": "^4.0.0", "react": "^17 || ^18 || ^19", "react-dom": "^17 || ^18 || ^19" }, "optionalPeers": ["@date-fns/tz", "@types/react", "date-fns"] }, "sha512-P0/1sxo6SBVZOklKMIedvTWqw2s2IQzi9x5bIVsXu980cuSOD4NeuRSs+/L7LZQfDkZP/uRZyGPyfFl/B1oH+Q=="],
 
@@ -723,13 +723,13 @@
 
     "typescript": ["typescript@6.0.2", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-bGdAIrZ0wiGDo5l8c++HWtbaNCWTS4UTv7RaTH/ThVIgjkveJt83m74bBHMJkuCbslY8ixgLBVZJIOiQlQTjfQ=="],
 
-    "typesense": ["typesense@3.0.6", "", { "dependencies": { "axios": "^1.15.0", "loglevel": "^1.9.2", "tslib": "^2.8.1" }, "peerDependencies": { "@babel/runtime": "^7.23.2" } }, "sha512-d3LL1qOLS8FCRxgAOqH+uDuK+VVA+/HYI1frU9fjYVwOg68mg/dX6XTtZ4yKKAkDCasB/se5uh/ZpMdOz/uJNg=="],
+    "typesense": ["typesense@3.1.1", "", { "dependencies": { "axios": "^1.15.0", "loglevel": "^1.9.2", "tslib": "^2.8.1" }, "peerDependencies": { "@babel/runtime": "^7.23.2" } }, "sha512-MbipLTJCebw/AakwFdo06P3/u1gQ0pWCiRjcL0I1bdLqHvtDr8bjP7N18Tfo/PTGIsj2aVr0QGkdv7lOjRBNNw=="],
 
-    "typesense-docsearch-core": ["typesense-docsearch-core@5.0.2-0", "", { "peerDependencies": { "@types/react": ">= 16.8.0 < 20.0.0", "react": ">= 16.8.0 < 20.0.0", "react-dom": ">= 16.8.0 < 20.0.0" }, "optionalPeers": ["@types/react", "react", "react-dom"] }, "sha512-9VEfczsnUswRhZKsKpBKno+Ubp5XxnDwbFL3M9gpECrksgo21LG0s0zsEbamJJXeoaOcSLb2wxYmXAso/n09PA=="],
+    "typesense-docsearch-core": ["typesense-docsearch-core@5.0.2-3", "", { "peerDependencies": { "@types/react": ">= 16.8.0 < 20.0.0", "react": ">= 16.8.0 < 20.0.0", "react-dom": ">= 16.8.0 < 20.0.0" }, "optionalPeers": ["@types/react", "react", "react-dom"] }, "sha512-tXSRghy33o4g/gvd2c1+Ys9qJB5FO1nWumClMVqQIy9VvpkhurwCYJyey2jqyq7inlxUm/qCrkWP93iK1Pp2mA=="],
 
-    "typesense-docsearch-css": ["typesense-docsearch-css@5.0.2-0", "", {}, "sha512-Ts7TH1YFVnsleDU9+vKo77j6MB8r96W/xIJP/f/AXtceqXT9yr1ERdsXwUNRh+1Ks5u+W1XyGYVtcGRwrdvpLg=="],
+    "typesense-docsearch-css": ["typesense-docsearch-css@5.0.2-3", "", {}, "sha512-dOGmjawqqZ/3QFSQ1dz/F0FZfi0hCqSPTNgbeYI/paYA5/RCyiw3PYz/EzXCzjctUfFD5iul16Vh1PxbmLrSEQ=="],
 
-    "typesense-docsearch-react": ["typesense-docsearch-react@5.0.2-0", "", { "dependencies": { "@ai-sdk/react": "^2.0.30", "@algolia/autocomplete-core": "1.19.2", "@base-ui/react": "^1.5.0", "ai": "^5.0.30", "algoliasearch": "^5.28.0", "marked": "^16.3.0", "typesense": "3.0.7-1", "typesense-docsearch-core": "5.0.2-0", "typesense-docsearch-css": "5.0.2-0", "typesense-instantsearch-adapter": "3.0.0", "zod": "^4.1.8" }, "peerDependencies": { "@types/react": ">= 16.8.0 < 20.0.0", "react": ">= 16.8.0 < 20.0.0", "react-dom": ">= 16.8.0 < 20.0.0", "search-insights": ">= 1 < 3" }, "optionalPeers": ["@types/react", "react", "react-dom", "search-insights"] }, "sha512-qMs9baBD/9tyup85Pb+75RyzsFoatXpHr/eJKueFmETxA+MWIrESeoh/LOMqlQW9Q4Jj6hzuzdNRXj+MXgLocw=="],
+    "typesense-docsearch-react": ["typesense-docsearch-react@5.0.2-3", "", { "dependencies": { "@ai-sdk/react": "^2.0.30", "@algolia/autocomplete-core": "1.19.2", "@base-ui/react": "^1.5.0", "ai": "^5.0.30", "algoliasearch": "^5.28.0", "marked": "^16.3.0", "typesense": "3.1.1", "typesense-docsearch-core": "5.0.2-3", "typesense-docsearch-css": "5.0.2-3", "typesense-instantsearch-adapter": "3.0.0", "zod": "^4.1.8" }, "peerDependencies": { "@types/react": ">= 16.8.0 < 20.0.0", "react": ">= 16.8.0 < 20.0.0", "react-dom": ">= 16.8.0 < 20.0.0", "search-insights": ">= 1 < 3" }, "optionalPeers": ["@types/react", "react", "react-dom", "search-insights"] }, "sha512-5j/e4fUf281M0MIMRlxp/ZFdTVvv7fdUTuSU6wnJ00l5Bfrv+S9maIZFFjX05IeWpK8QS8GFs+VeyxOVwVnnUw=="],
 
     "typesense-instantsearch-adapter": ["typesense-instantsearch-adapter@3.0.0", "", { "dependencies": { "typesense": "^3.0.0-2" }, "peerDependencies": { "@babel/runtime": "^7.24.1" } }, "sha512-OSvw0SgSMYMWsDKX1bZKKsCS6jyuopbRqoNJy2nr+J4NkwnZPuioyFiiwvTBPwimuFc8+fSNwqvSAyMRius9Lw=="],
 
@@ -777,10 +777,6 @@
 
     "@ai-sdk/provider-utils/undici": ["undici@5.29.0", "", { "dependencies": { "@fastify/busboy": "^2.0.0" } }, "sha512-raqeBD6NQK4SkWhQzeYKd1KmIG6dllBOTt55Rmkt4HtI9mwdWtJljnrXjAFUBLTSN67HWrOIZ3EPF4kjUw80Bg=="],
 
-    "@base-ui/react/@babel/runtime": ["@babel/runtime@7.29.7", "", {}, "sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw=="],
-
-    "@base-ui/utils/@babel/runtime": ["@babel/runtime@7.29.7", "", {}, "sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw=="],
-
     "@rspress/core/@rsbuild/core": ["@rsbuild/core@2.0.0-beta.11", "", { "dependencies": { "@rspack/core": "2.0.0-beta.9", "@swc/helpers": "^0.5.20" }, "peerDependencies": { "core-js": ">= 3.0.0" }, "optionalPeers": ["core-js"], "bin": { "rsbuild": "bin/rsbuild.js" } }, "sha512-IBbQx7SrnSpD7j2p2qyq3qDxoqmG4E6lcflTpbBitX6iUrzpVRQbP4rktXZ2iuY7ph9+FtUK/SVAVA+Ocm3Nig=="],
 
     "@rspress/shared/@rsbuild/core": ["@rsbuild/core@2.0.0-beta.11", "", { "dependencies": { "@rspack/core": "2.0.0-beta.9", "@swc/helpers": "^0.5.20" }, "peerDependencies": { "core-js": ">= 3.0.0" }, "optionalPeers": ["core-js"], "bin": { "rsbuild": "bin/rsbuild.js" } }, "sha512-IBbQx7SrnSpD7j2p2qyq3qDxoqmG4E6lcflTpbBitX6iUrzpVRQbP4rktXZ2iuY7ph9+FtUK/SVAVA+Ocm3Nig=="],
@@ -796,8 +792,6 @@
     "parse5/entities": ["entities@6.0.1", "", {}, "sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g=="],
 
     "readdirp/picomatch": ["picomatch@2.3.2", "", {}, "sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA=="],
-
-    "typesense-docsearch-react/typesense": ["typesense@3.0.7-1", "", { "dependencies": { "axios": "^1.15.0", "loglevel": "^1.9.2", "tslib": "^2.8.1" }, "peerDependencies": { "@babel/runtime": "^7.23.2" } }, "sha512-RwpIbarPJI24iTBS0eskswaDCaIf8lxWcLiiPvLKpv/azd+Ivbcc44S+n0yRsfqGyy9xX2+LixJArStzD+4pkQ=="],
 
     "@rspress/core/@rsbuild/core/@rspack/core": ["@rspack/core@2.0.0-beta.9", "", { "dependencies": { "@rspack/binding": "2.0.0-beta.9" }, "peerDependencies": { "@module-federation/runtime-tools": "^0.24.1 || ^2.0.0", "@swc/helpers": ">=0.5.1" }, "optionalPeers": ["@module-federation/runtime-tools", "@swc/helpers"] }, "sha512-4sN3f72l4cj8n/dSCdWn6FkSjfHiDxHWrO1Kmqd0Bk0MmgyW+ldHitsSWPETCAxjTJGXY34r5sou5sYzb0DRww=="],
 
