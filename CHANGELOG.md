@@ -1,5 +1,13 @@
 # rspress-plugin-typesense
 
+## 0.1.1
+
+### Patch Changes
+
+- Update dependencies Typesense Docsearch
+
+## 0.1.0
+
 ### Minor Changes
 
 - **Upgrade to DocSearch v5**:
